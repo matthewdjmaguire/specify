@@ -152,6 +152,7 @@ the hard way. (Mirrored in the Notion app page's Learnings section — keep both
   reuse. Treat bulk scraping as a standing, unresolved legal risk — mitigated for v1 by
   hotlinking images (never mirrored) and keeping the seed set small/curated rather than
   crawling their full ~306k-page catalogue.
+- **A test that inserts into a shared/global table (not owned by a test user) leaks permanently if cleanup only deletes test users.** SPEC-007's admin-global-theme test created a real global `quiz_themes` row every run; no FK ties it to the deleted test user, so it never got cascaded away. 14 copies had silently accumulated in the live database, surfaced only via a live bug report on the `/quizzes` page. Any test inserting into `plants` or a global (`owner_id = null`) `quiz_themes` row must track and delete what it created in `afterAll` — the per-user cascade safety net doesn't apply.
 - **Supabase-js query builders are not real Promises — `.catch()` chained directly after a query throws `TypeError: ... .catch is not a function`.** Hit this twice writing RLS test cleanup (`quizzes.rls.test.ts`, then `plant-stats.rls.test.ts`) before it made it here. Use `try { await query } catch {}` instead of `query.catch(() => {})`.
 - **This shadcn install is built on Base UI, not Radix** — `shadcn init` picked `@base-ui/react`
   under the hood. Base UI has no `asChild` prop; its polymorphism API is a `render` prop
