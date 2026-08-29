@@ -3,14 +3,18 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { createQuizTheme, updateQuizTheme, type QuizThemeInput } from "@/app/actions/quiz-themes";
+import { createGlobalQuizTheme, createQuizTheme, updateQuizTheme, type QuizThemeInput } from "@/app/actions/quiz-themes";
 
 export function ThemeForm({
   themeId,
   initial,
+  isGlobal = false,
+  redirectTo = "/settings/quizzes",
 }: {
   themeId?: string;
   initial: QuizThemeInput;
+  isGlobal?: boolean;
+  redirectTo?: string;
 }) {
   const router = useRouter();
   const [displayName, setDisplayName] = useState(initial.displayName);
@@ -29,10 +33,12 @@ export function ThemeForm({
       try {
         if (themeId) {
           await updateQuizTheme(themeId, { displayName, prompt });
+        } else if (isGlobal) {
+          await createGlobalQuizTheme({ displayName, prompt });
         } else {
           await createQuizTheme({ displayName, prompt });
         }
-        router.push("/settings/quizzes");
+        router.push(redirectTo);
         router.refresh();
       } catch (err) {
         setError(err instanceof Error ? err.message : "Couldn't save the theme.");

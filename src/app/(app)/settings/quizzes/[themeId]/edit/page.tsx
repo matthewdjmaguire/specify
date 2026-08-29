@@ -8,7 +8,7 @@ export default async function EditQuizThemePage({ params }: { params: Promise<{ 
 
   const { data: theme } = await supabase
     .from("quiz_themes")
-    .select("id, display_name, prompt")
+    .select("id, display_name, prompt, is_global")
     .eq("id", themeId)
     .single();
   if (!theme) notFound();
@@ -16,7 +16,11 @@ export default async function EditQuizThemePage({ params }: { params: Promise<{ 
   return (
     <div className="flex flex-1 flex-col items-center gap-6 p-8">
       <h1 className="w-full max-w-md text-2xl font-semibold tracking-tight">Edit quiz theme</h1>
-      <ThemeForm themeId={theme.id} initial={{ displayName: theme.display_name, prompt: theme.prompt }} />
+      <ThemeForm
+        themeId={theme.id}
+        initial={{ displayName: theme.display_name, prompt: theme.prompt }}
+        redirectTo={theme.is_global ? "/admin" : "/settings/quizzes"}
+      />
     </div>
   );
 }
