@@ -1,15 +1,8 @@
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
+import { FavouriteButton } from "./favourite-button";
+import { PlantDetails } from "./plant-details";
 import type { QuizPlant } from "@/lib/quiz/types";
-
-function Field({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="text-sm">{value}</dd>
-    </div>
-  );
-}
 
 export type RevealLevel = "hidden" | "name" | "full";
 
@@ -18,7 +11,19 @@ export type RevealLevel = "hidden" | "name" | "full";
 // the full characteristics card stays hidden until the *second* question
 // (the plant's first follow-up) has also been answered. A plain
 // revealed:boolean couldn't express the middle state.
-export function PlantFlashcard({ plant, revealLevel }: { plant: QuizPlant; revealLevel: RevealLevel }) {
+export function PlantFlashcard({
+  plant,
+  revealLevel,
+  isFavourite,
+}: {
+  plant: QuizPlant;
+  revealLevel: RevealLevel;
+  // why optional: this component is also used in the favourites gallery,
+  // which does its own favourite-toggle button placement (a whole card is
+  // clickable to expand/collapse there) rather than the quiz flow's fixed
+  // corner button.
+  isFavourite?: boolean;
+}) {
   return (
     <Card className="w-full max-w-md overflow-hidden gap-0 py-0">
       <div className="relative aspect-4/3 w-full bg-muted">
@@ -32,6 +37,13 @@ export function PlantFlashcard({ plant, revealLevel }: { plant: QuizPlant; revea
             No image available
           </div>
         )}
+        {revealLevel !== "hidden" && isFavourite !== undefined && (
+          <FavouriteButton
+            plantId={plant.id}
+            initialIsFavourite={isFavourite}
+            className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm hover:bg-background"
+          />
+        )}
       </div>
       {revealLevel !== "hidden" && (
         <CardContent className="flex flex-col gap-3 py-4">
@@ -40,31 +52,7 @@ export function PlantFlashcard({ plant, revealLevel }: { plant: QuizPlant; revea
             {plant.commonName && <p className="text-sm text-muted-foreground">{plant.commonName}</p>}
           </div>
 
-          {revealLevel === "full" && (
-            <>
-              <dl className="grid grid-cols-2 gap-x-4 gap-y-2">
-                {plant.family && <Field label="Family" value={plant.family} />}
-                {plant.habit && <Field label="Habit" value={plant.habit} />}
-                {plant.hardiness && <Field label="Hardiness" value={plant.hardiness} />}
-                {plant.heightRange && <Field label="Height" value={plant.heightRange} />}
-                {plant.spreadRange && <Field label="Spread" value={plant.spreadRange} />}
-                {plant.soilTypes.length > 0 && <Field label="Soil" value={plant.soilTypes.join(", ")} />}
-                {plant.position.length > 0 && <Field label="Position" value={plant.position.join(", ")} />}
-                {plant.moisture && <Field label="Moisture" value={plant.moisture} />}
-              </dl>
-              {plant.description && <p className="text-sm text-muted-foreground">{plant.description}</p>}
-              {plant.sourceUrl && (
-                <a
-                  href={plant.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
-                >
-                  View on RHS →
-                </a>
-              )}
-            </>
-          )}
+          {revealLevel === "full" && <PlantDetails plant={plant} />}
         </CardContent>
       )}
     </Card>

@@ -34,6 +34,7 @@ export function QuizRunner({
   mode,
   questions: initialQuestions,
   catalogue,
+  favouritePlantIds,
 }: {
   attemptId: string;
   themeId: string;
@@ -46,6 +47,7 @@ export function QuizRunner({
     plant: QuizPlant;
   }>;
   catalogue: QuizPlant[];
+  favouritePlantIds: string[];
 }) {
   const router = useRouter();
   const [isFinishing, startFinishing] = useTransition();
@@ -53,6 +55,7 @@ export function QuizRunner({
   const [questions, setQuestions] = useState<QuestionState[]>(() =>
     initialQuestions.map((q) => ({ ...q, userAnswer: null })),
   );
+  const [favouriteIds] = useState(() => new Set(favouritePlantIds));
   const current = questions[index];
   const isFollowup = current?.questionType.startsWith("characteristic:") ?? false;
   const followupCategory = isFollowup
@@ -163,7 +166,7 @@ export function QuizRunner({
         onJump={setIndex}
       />
 
-      <PlantFlashcard plant={current.plant} revealLevel={revealLevel} />
+      <PlantFlashcard plant={current.plant} revealLevel={revealLevel} isFavourite={favouriteIds.has(current.plant.id)} />
 
       {isFollowup && followupQuestion && (
         <CharacteristicQuestion

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, LayoutGrid, Shuffle } from "lucide-react";
+import { Heart, Home, LayoutGrid, Shuffle } from "lucide-react";
 import type { NavTheme } from "@/lib/data/nav";
 
 export function BottomNav({ themes }: { themes: NavTheme[] }) {
@@ -13,6 +13,7 @@ export function BottomNav({ themes }: { themes: NavTheme[] }) {
     { href: "/", label: "Home", icon: Home },
     ...(luckyDip ? [{ href: `/quiz/${luckyDip.id}`, label: "Lucky Dip", icon: Shuffle }] : []),
     { href: "/quizzes", label: "Quizzes", icon: LayoutGrid },
+    { href: "/favourites", label: "Favourites", icon: Heart },
   ];
 
   return (

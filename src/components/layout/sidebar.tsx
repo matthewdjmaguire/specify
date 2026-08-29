@@ -34,6 +34,7 @@ export function Sidebar({ themes }: { themes: NavTheme[] }) {
         <span className="text-lg font-semibold text-sidebar-foreground">Specify</span>
       </Link>
       <NavLink href="/">Home</NavLink>
+      <NavLink href="/favourites">Favourites</NavLink>
       <Separator className="my-2" />
       <p className="px-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">Quizzes</p>
       {luckyDip && <NavLink href={`/quiz/${luckyDip.id}`}>{luckyDip.displayName}</NavLink>}

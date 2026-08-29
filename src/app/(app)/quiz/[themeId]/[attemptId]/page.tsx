@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { resolveThemePlants, toQuizPlant, PLANT_COLUMNS, type PlantRow } from "@/lib/quiz/resolve-theme-plants";
+import { getFavouritePlantIds } from "@/app/actions/favourites";
 import { QuizRunner } from "./quiz-runner";
 import type { QuizPlant } from "@/lib/quiz/types";
 
@@ -29,7 +30,7 @@ export default async function QuizAttemptPage({
 
   const mode = attempt.mode as "learning" | "intermediate" | "hard";
 
-  const [{ data: questions }, catalogue] = await Promise.all([
+  const [{ data: questions }, catalogue, favouritePlantIds] = await Promise.all([
     supabase
       .from("quiz_questions")
       .select(`id, sequence, status, question_type, plants(${PLANT_COLUMNS})`)
@@ -43,6 +44,7 @@ export default async function QuizAttemptPage({
     mode !== "learning"
       ? resolveThemePlants(supabase, { prompt: "", isLuckyDip: true }, attempt.geo_scope as "UK" | "Global")
       : Promise.resolve([] as QuizPlant[]),
+    getFavouritePlantIds(),
   ]);
 
   const items = ((questions ?? []) as unknown as QuestionRow[]).map((q) => ({
@@ -53,5 +55,14 @@ export default async function QuizAttemptPage({
     plant: toQuizPlant(q.plants),
   }));
 
-  return <QuizRunner attemptId={attempt.id} themeId={themeId} mode={mode} questions={items} catalogue={catalogue} />;
+  return (
+    <QuizRunner
+      attemptId={attempt.id}
+      themeId={themeId}
+      mode={mode}
+      questions={items}
+      catalogue={catalogue}
+      favouritePlantIds={favouritePlantIds}
+    />
+  );
 }
