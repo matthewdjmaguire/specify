@@ -152,3 +152,9 @@ the hard way. (Mirrored in the Notion app page's Learnings section — keep both
   reuse. Treat bulk scraping as a standing, unresolved legal risk — mitigated for v1 by
   hotlinking images (never mirrored) and keeping the seed set small/curated rather than
   crawling their full ~306k-page catalogue.
+- **This shadcn install is built on Base UI, not Radix** — `shadcn init` picked `@base-ui/react`
+  under the hood. Base UI has no `asChild` prop; its polymorphism API is a `render` prop
+  instead (`<DropdownMenuItem render={<Link href="/x">X</Link>} />`, not
+  `<DropdownMenuItem asChild><Link>X</Link></DropdownMenuItem>`). Every future ticket that
+  composes a shadcn menu/dialog/tooltip trigger with `next/link` or a custom element needs
+  this — found via a real TS error building SPEC-008's profile dropdown, not from docs.
