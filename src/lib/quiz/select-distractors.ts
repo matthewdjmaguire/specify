@@ -1,13 +1,5 @@
 import type { QuizPlant } from "./types";
-
-function pickRandom<T>(items: T[], count: number, random: () => number): T[] {
-  const shuffled = [...items];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled.slice(0, count);
-}
+import { pickRandom } from "./random-utils";
 
 // why family first, then habit, then anything: a distractor from the same
 // family (e.g. another Acer) is a genuinely plausible wrong answer for a

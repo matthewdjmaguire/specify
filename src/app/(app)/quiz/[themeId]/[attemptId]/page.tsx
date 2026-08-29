@@ -79,10 +79,12 @@ export default async function QuizAttemptPage({
       )
       .eq("attempt_id", attemptId)
       .order("sequence"),
-    // why fetched only for intermediate mode: distractor generation is the
-    // only thing that needs a broader pool than the attempt's own
-    // questions — skip the extra query entirely for Learning/Hard modes.
-    mode === "intermediate"
+    // why fetched whenever mode !== "learning": Intermediate mode's name
+    // question needs a distractor pool, and *any* non-Learning mode's
+    // follow-up characteristic questions (SPEC-014) need one too — Learning
+    // mode has neither (its flashcard shows everything inline already), so
+    // it's the only mode that skips this extra query.
+    mode !== "learning"
       ? resolveThemePlants(supabase, { prompt: "", isLuckyDip: true }, attempt.geo_scope as "UK" | "Global")
       : Promise.resolve([] as QuizPlant[]),
   ]);
@@ -91,6 +93,7 @@ export default async function QuizAttemptPage({
     questionId: q.id,
     sequence: q.sequence,
     status: q.status,
+    questionType: q.question_type,
     plant: toQuizPlant(q.plants),
   }));
 

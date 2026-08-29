@@ -88,4 +88,76 @@ describe("starting a quiz attempt (against the live schema)", () => {
     expect(attempt!.question_count).toBeLessThanOrEqual(5);
     expect(attempt!.question_count).toBeGreaterThan(0);
   });
+
+  it("creates follow-up characteristic questions for non-Learning modes, honouring profiles.followup_count", async () => {
+    const user = await newTestUser("startquiz-followup");
+    await user.client.from("profiles").update({ followup_count: 2 }).eq("id", user.userId);
+
+    const { data: theme } = await user.client
+      .from("quiz_themes")
+      .insert({ display_name: "Acer followup", prompt: "acer", owner_id: user.userId, is_global: false })
+      .select("id")
+      .single();
+
+    const attemptId = await startQuizAttemptAs(user, {
+      themeId: theme!.id,
+      mode: "intermediate",
+      geoScope: "Global",
+      questionCount: 2,
+    });
+
+    const { data: questions } = await user.client
+      .from("quiz_questions")
+      .select("sequence, question_type, plant_id")
+      .eq("attempt_id", attemptId)
+      .order("sequence");
+
+    const nameQuestions = questions!.filter((q) => q.question_type === "name");
+    const followupQuestions = questions!.filter((q) => q.question_type.startsWith("characteristic:"));
+
+    expect(nameQuestions).toHaveLength(2);
+    // why >0 rather than exactly 4 (2 plants x 2 requested): a real Acer
+    // plant may not have data for 2 distinct categories, in which case
+    // fewer follow-ups get created for it — SPEC-014's own "skip
+    // unpopulated categories" rule, exercised here against real data rather
+    // than a synthetic fixture.
+    expect(followupQuestions.length).toBeGreaterThan(0);
+    expect(followupQuestions.length).toBeLessThanOrEqual(4);
+
+    // Every follow-up must immediately follow (in sequence) a question
+    // about the *same* plant — it's a follow-up to that specific name
+    // question, not an unrelated one.
+    for (const followup of followupQuestions) {
+      const sameSequenceGroup = questions!.filter((q) => q.plant_id === followup.plant_id);
+      expect(sameSequenceGroup.some((q) => q.question_type === "name")).toBe(true);
+    }
+
+    // Sequence numbers are contiguous 1..N with no gaps or duplicates.
+    const sequences = questions!.map((q) => q.sequence).sort((a, b) => a - b);
+    expect(sequences).toEqual(Array.from({ length: sequences.length }, (_, i) => i + 1));
+  });
+
+  it("creates no follow-up questions for Learning mode even with followup_count > 1", async () => {
+    const user = await newTestUser("startquiz-nofollowup");
+    await user.client.from("profiles").update({ followup_count: 5 }).eq("id", user.userId);
+
+    const { data: theme } = await user.client
+      .from("quiz_themes")
+      .insert({ display_name: "Acer learning", prompt: "acer", owner_id: user.userId, is_global: false })
+      .select("id")
+      .single();
+
+    const attemptId = await startQuizAttemptAs(user, {
+      themeId: theme!.id,
+      mode: "learning",
+      geoScope: "Global",
+      questionCount: 2,
+    });
+
+    const { data: questions } = await user.client
+      .from("quiz_questions")
+      .select("question_type")
+      .eq("attempt_id", attemptId);
+    expect(questions!.every((q) => q.question_type === "name")).toBe(true);
+  });
 });

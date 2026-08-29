@@ -4,6 +4,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { resolveThemePlants } from "@/lib/quiz/resolve-theme-plants";
 import { selectQuizPlants } from "@/lib/quiz/select-plants";
+import { selectFollowupCategories } from "@/lib/quiz/followup-questions";
+import type { QuizPlant } from "@/lib/quiz/types";
 
 export type StartQuizInput = {
   themeId: string;
@@ -67,12 +69,42 @@ export async function startQuizAttemptCore(
     .single();
   if (attemptError) throw attemptError;
 
-  const questionRows = selected.map((plant, index) => ({
-    attempt_id: attempt.id,
-    plant_id: plant.id,
-    question_type: "name" as const,
-    sequence: index + 1,
-  }));
+  // why not for Learning mode: Learning mode's flashcard already shows every
+  // characteristic inline as a teaching aid (SPEC-011) — there's no "name
+  // question" to follow up after, since nothing is being tested. Creating
+  // characteristic rows there would just leave them permanently unanswered.
+  let followupCount = 0;
+  if (input.mode !== "learning") {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("followup_count")
+      .eq("id", userId)
+      .single();
+    followupCount = profile?.followup_count ?? 1;
+  }
+
+  const questionRows: Array<{
+    attempt_id: string;
+    plant_id: string;
+    question_type: string;
+    sequence: number;
+  }> = [];
+  let sequence = 1;
+  for (const plant of selected as QuizPlant[]) {
+    questionRows.push({ attempt_id: attempt.id, plant_id: plant.id, question_type: "name", sequence: sequence++ });
+    if (followupCount > 0) {
+      const categories = selectFollowupCategories(plant, followupCount);
+      for (const category of categories) {
+        questionRows.push({
+          attempt_id: attempt.id,
+          plant_id: plant.id,
+          question_type: `characteristic:${category}`,
+          sequence: sequence++,
+        });
+      }
+    }
+  }
+
   const { error: questionsError } = await supabase.from("quiz_questions").insert(questionRows);
   if (questionsError) throw questionsError;
 
