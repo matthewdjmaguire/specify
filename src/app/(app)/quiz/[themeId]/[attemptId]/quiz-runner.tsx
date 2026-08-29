@@ -4,7 +4,9 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PlantFlashcard } from "@/components/quiz/plant-flashcard";
 import { IntermediateQuestion } from "@/components/quiz/intermediate-question";
+import { HardQuestion } from "@/components/quiz/hard-question";
 import { selectDistractors } from "@/lib/quiz/select-distractors";
+import { isCloseEnough } from "@/lib/quiz/fuzzy-match";
 import { submitAnswer } from "@/app/actions/quiz-questions";
 import type { QuizPlant } from "@/lib/quiz/types";
 
@@ -73,6 +75,15 @@ export function QuizRunner({
     await submitAnswer(current.questionId, status, option.scientificName);
   }
 
+  async function handleHardAnswer(value: string) {
+    const isCorrect = isCloseEnough(value, current.plant.scientificName);
+    const status = isCorrect ? "correct" : "incorrect";
+    setQuestions((prev) =>
+      prev.map((q) => (q.questionId === current.questionId ? { ...q, status, userAnswer: value } : q)),
+    );
+    await submitAnswer(current.questionId, status, value);
+  }
+
   const answeredOption = options.find((o) => o.scientificName === current.userAnswer);
 
   return (
@@ -93,10 +104,14 @@ export function QuizRunner({
       )}
 
       {mode === "hard" && (
-        <div className="flex w-full max-w-md flex-col items-center gap-4">
-          <PlantFlashcard plant={current.plant} revealed={false} />
-          <p className="text-sm text-muted-foreground">Hard mode question UI is coming soon.</p>
-        </div>
+        <HardQuestion
+          key={current.questionId}
+          plant={current.plant}
+          answered={current.status !== "unanswered"}
+          isCorrect={current.status === "correct"}
+          previousAnswer={current.userAnswer}
+          onSubmit={handleHardAnswer}
+        />
       )}
 
       <div className="flex gap-2">
