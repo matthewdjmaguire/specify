@@ -24,6 +24,7 @@ export function CharacteristicQuestion({
             <button
               key={option}
               type="button"
+              data-testid="answer-option"
               onClick={() => onSelect(option)}
               disabled={showFeedback}
               className={`rounded-lg border p-3 text-left transition-colors disabled:cursor-default ${

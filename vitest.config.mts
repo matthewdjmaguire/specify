@@ -10,6 +10,10 @@ export default defineConfig({
   test: {
     environment: "node",
     setupFiles: ["./vitest.setup.ts"],
+    // why: vitest's default include glob (**/*.spec.ts) otherwise picks up
+    // the Playwright e2e specs too — those use Playwright's own `test`
+    // global (test.use(), fixtures), which isn't valid under vitest's.
+    exclude: ["**/node_modules/**", "**/e2e/**"],
     // why: parallel RLS test files each sign up real Supabase Auth users —
     // Supabase's auth endpoints rate-limit rapid sign-ups, and running test
     // files in parallel (Vitest's default) reliably trips that limit once

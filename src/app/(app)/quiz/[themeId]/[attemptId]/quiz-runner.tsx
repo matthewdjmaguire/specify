@@ -193,15 +193,22 @@ export function QuizRunner({
       )}
 
       <div className="flex gap-2">
-        <Button variant="outline" onClick={() => setIndex((i) => Math.max(0, i - 1))} disabled={index === 0}>
+        <Button
+          variant="outline"
+          data-testid="quiz-back"
+          onClick={() => setIndex((i) => Math.max(0, i - 1))}
+          disabled={index === 0}
+        >
           Back
         </Button>
         {isLastQuestion ? (
-          <Button onClick={handleFinish} disabled={isFinishing}>
+          <Button data-testid="quiz-finish" onClick={handleFinish} disabled={isFinishing}>
             {isFinishing ? "Finishing…" : "Finish"}
           </Button>
         ) : (
-          <Button onClick={() => setIndex((i) => Math.min(questions.length - 1, i + 1))}>Next</Button>
+          <Button data-testid="quiz-next" onClick={() => setIndex((i) => Math.min(questions.length - 1, i + 1))}>
+            Next
+          </Button>
         )}
       </div>
     </div>

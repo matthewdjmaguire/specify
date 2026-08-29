@@ -44,6 +44,7 @@ export function StartQuizForm({
           <button
             key={m.value}
             type="button"
+            data-testid={`mode-${m.value}`}
             onClick={() => setMode(m.value)}
             className={`rounded-lg border p-3 text-left transition-colors ${
               mode === m.value ? "border-primary bg-secondary" : "border-border hover:bg-muted"
@@ -55,7 +56,7 @@ export function StartQuizForm({
         ))}
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
-      <Button onClick={handleStart} disabled={isPending} size="lg">
+      <Button data-testid="start-quiz" onClick={handleStart} disabled={isPending} size="lg">
         {isPending ? "Starting…" : "Start quiz"}
       </Button>
     </div>

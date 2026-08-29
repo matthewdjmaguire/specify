@@ -28,6 +28,7 @@ function SelectableGroup<T extends string | number>({
         <button
           key={option}
           type="button"
+          aria-pressed={option === value}
           onClick={() => onChange(option)}
           className={`rounded-lg border px-3 py-1.5 text-sm transition-colors ${
             option === value ? "border-primary bg-secondary" : "border-border hover:bg-muted"

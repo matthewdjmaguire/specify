@@ -27,6 +27,7 @@ export function IntermediateQuestion({
             <button
               key={option.id}
               type="button"
+              data-testid="answer-option"
               onClick={() => onSelect(option)}
               disabled={showFeedback}
               className={`rounded-lg border p-3 text-left italic transition-colors disabled:cursor-default ${

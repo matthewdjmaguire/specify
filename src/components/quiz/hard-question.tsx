@@ -33,6 +33,7 @@ export function HardQuestion({
         <form onSubmit={handleSubmit} className="flex gap-2">
           <input
             type="text"
+            data-testid="hard-answer-input"
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder="Scientific name…"
@@ -41,7 +42,7 @@ export function HardQuestion({
             spellCheck={false}
             className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm italic outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
-          <Button type="submit" disabled={!value.trim()}>
+          <Button type="submit" data-testid="hard-answer-submit" disabled={!value.trim()}>
             Submit
           </Button>
         </form>
