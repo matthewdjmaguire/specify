@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# scraper: cached raw sitemap URL list (~306k entries), regenerable via `npm run scrape:rhs`
+scripts/.cache/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

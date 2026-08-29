@@ -1,0 +1,779 @@
+<!DOCTYPE html><!--
+  data-rhs-gpt-privacy="native" does double duty, so it is only present while
+  FLAG_DIRECT_AD_SERVING is on:
+
+  1. It tells the Cloudflare snippet not to inject its OneTrust → GPT bridge into
+     this response, because these pages apply limited-ads privacy settings
+     themselves via AdSlotInit.astro. Two owners of googletag privacy state would
+     fight over every ad request.
+  2. It is how the client bundle learns the toggle — see
+     isDirectAdServingPage() in google-ads.ts. Component scripts are bundled at
+     build time and cannot read Astro.locals.runtime.env directly.
+
+  Absent therefore means "Astro is not handling ad privacy", which is exactly when
+  the snippet should act. The two can never both be live.
+--><html data-rhs-gpt-privacy="native" lang="en"> <head><meta charset="UTF-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><title>Lavandula angustifolia &#39;Compacta&#39; | English lavender &#39;Compacta&#39;</title><meta content="Royal Horticultural Society" name="application-name"><meta content="/ui-assets/rhs-logo-144x144.png" name="msapplication-TileImage"><meta content="#005a4e" name="msapplication-TileColor"><meta content="#005a4e" name="theme-color"><meta content="Royal Horticultural Society" name="copyright"><link as="font" crossorigin href="/ui-assets/fonts/gt-super-text-black.woff2" rel="preload" type="font/woff2"><link as="font" crossorigin href="/ui-assets/fonts/freigsanproboo-webfont.woff2" rel="preload" type="font/woff2"><link as="font" crossorigin href="/ui-assets/fonts/rhs-icons.woff2" rel="preload" type="font/woff2"><link as="font" crossorigin href="/ui-assets/fonts/fa-brands-400.woff2" rel="preload" type="font/woff2"><link as="font" crossorigin href="/ui-assets/fonts/fa-light-300.woff2" rel="preload" type="font/woff2"><link as="font" crossorigin href="/ui-assets/fonts/fa-regular-400.woff2" rel="preload" type="font/woff2"><link as="font" crossorigin href="/ui-assets/fonts/fa-solid-900.woff2" rel="preload" type="font/woff2"><link crossorigin href="https://assets.rhs.org.uk" rel="preconnect"><link crossorigin="" href="https://cdn-ukwest.onetrust.com" rel="preconnect"><link href="https://cdn-ukwest.onetrust.com" rel="dns-prefetch"><link href="https://www.googletagmanager.com" rel="dns-prefetch"><link crossorigin="" href="https://pagead2.googlesyndication.com" rel="preconnect"><script async charset="UTF-8" data-domain-script="e5d214f7-a310-42da-849b-afcba27ad735" fetchpriority="high" src="https://cdn-ukwest.onetrust.com/scripttemplates/otSDKStub.js"></script><script>(function(){const codeVersion = "1.125.2";
+const codeOrigin = "RHS.Website";
+const pageType = "plant_profile";
+const pageModified = undefined;
+const collection = "gardening";
+
+  function getAccountType() {
+    try {
+      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      if (!isLoggedIn) return 'guest';
+      const isMember = localStorage.getItem('isMember') === 'true';
+      return isMember ? 'member' : 'registered';
+    } catch {
+      return 'unavailable';
+    }
+  }
+
+  const accountType = getAccountType();
+
+  if (accountType === 'member' || accountType === 'registered') {
+    (window.dataLayer = window.dataLayer || []).push({
+      event: 'user_info',
+      account_type: accountType,
+    });
+  }
+
+  (window.dataLayer = window.dataLayer || []).push({
+    event: 'page_view',
+    code_origin: codeOrigin,
+    code_version: codeVersion,
+    ...(pageType && { page_type: pageType }),
+    ...(pageModified && { page_modified: pageModified }),
+    ...(collection && { page_collection: collection }),
+  });
+})();</script><script async src="https://pagead2.googlesyndication.com/tag/js/gpt.js"></script><script>(function (w, d, s, l, i) {
+  w[l] = w[l] || [];
+  w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+  const f = d.getElementsByTagName(s)[0],
+    j = d.createElement(s),
+    dl = l != 'dataLayer' ? '&l=' + l : '';
+  j.async = true;
+  j.src = 'https://sgtm.rhs.org.uk/gtm.js?id=' + i + "&gtm_cookies_win=x" + dl;
+  f.parentNode.insertBefore(j, f);
+})(window, document, 'script', 'dataLayer', "GTM-5GZXDJDF");</script><script src="https://cdn.optimizely.com/js/4753472860454912.js"></script><script async src="https://static.srcspot.com/libs/isa.js"></script><script crossorigin="anonymous" integrity="sha384-ayXYs8oRhIPXuBczmk76vNvyJFND5u2JGFvhglzkPYRdIK/gjlM22v42WBBkXQvb" src="https://assets.sitescdn.net/answers-search-bar/v1.6.3/answerstemplates.compiled.min.js"></script> <script>(function(){const yextApiKey = "e37dcd85075611eaf5b95a155856af37";
+const yextBusinessId = "3899779";
+
+  window.initAnswers = function initAnswers() {
+    ANSWERS.init({
+      apiKey: yextApiKey,
+      experienceKey: 'rhs-search',
+      experienceVersion: 'PRODUCTION',
+      locale: 'en_GB',
+      businessId: yextBusinessId,
+      templateBundle: TemplateBundle.default,
+      onReady: function () {
+        ANSWERS.addComponent('SearchBar', {
+          container: '.search-form-mobile',
+          useForm: true,
+          name: 'search-bar-mobile',
+          redirectUrl: 'https://www.rhs.org.uk/search',
+          placeholderText: 'Search...',
+          submitIcon: 'custom',
+        });
+        ANSWERS.addComponent('SearchBar', {
+          container: '.search-form',
+          useForm: true,
+          name: 'search-bar',
+          redirectUrl: 'https://www.rhs.org.uk/search',
+          placeholderText: 'Search...',
+          submitIcon: 'custom',
+        });
+      },
+    });
+  };
+})();</script> <script async crossorigin="anonymous" defer integrity="sha384-MNXdP3h+f1elRtlpyX/vA2qQITrmf3Y2YsU6mjOns3khCM1JDD/+PbTxYg/DLjyM" onload="ANSWERS.domReady(initAnswers)" src="https://assets.sitescdn.net/answers-search-bar/v1.6.3/answers.min.js"></script><script type="module" src="/_astro/AdSlotInit.astro_astro_type_script_index_0_lang.Dr7oES9K.js"></script><style>@font-face{font-family:"Open Sans-c74c5f7ccdf6f775";src:url("/_astro/fonts/b1ad3e4bfdb6db7d.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:300 800;font-style:italic;}@font-face{font-family:"Open Sans-c74c5f7ccdf6f775";src:url("/_astro/fonts/e670973062770c6a.woff2") format("woff2");font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;font-weight:300 800;font-style:normal;}@font-face{font-family:"Open Sans-c74c5f7ccdf6f775 fallback: Arial";src:local("Arial");font-display:swap;font-weight:300 800;font-style:italic;size-adjust:99.5619%;ascent-override:107.3551%;descent-override:29.4258%;line-gap-override:0%;}@font-face{font-family:"Open Sans-c74c5f7ccdf6f775 fallback: Arial";src:local("Arial");font-display:swap;font-weight:300 800;font-style:normal;size-adjust:99.5619%;ascent-override:107.3551%;descent-override:29.4258%;line-gap-override:0%;}:root{--font-open-sans:"Open Sans-c74c5f7ccdf6f775","Open Sans-c74c5f7ccdf6f775 fallback: Arial",sans-serif;}</style><link rel="preload" href="/_astro/fonts/b1ad3e4bfdb6db7d.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/_astro/fonts/e670973062770c6a.woff2" as="font" type="font/woff2" crossorigin><meta content="Find help &#38; information on Lavandula angustifolia 'Compacta' | English lavender 'Compacta' from the RHS" name="description"><meta content="index, follow" name="robots"><meta content="Lavandula angustifolia 'Compacta' | English lavender 'Compacta'" property="og:title"><meta content="Find help &#38; information on Lavandula angustifolia 'Compacta' | English lavender 'Compacta' from the RHS" property="og:description"><meta content="article" property="og:type"><meta content="https://www.rhs.org.uk/plants/9887/lavandula-angustifolia-compacta/details" property="og:url"><meta content="https://www.rhs.org.uk/ui-assets/rhs-logo-icon.svg" property="og:image"><meta content="Lavandula angustifolia 'Compacta' | English lavender 'Compacta'" property="og:image:alt"><meta content="en_GB" property="og:locale"><meta content="summary_large_image" name="twitter:card"><meta content="@The_RHS" name="twitter:site"><meta content="https://www.rhs.org.uk/plants/9887/lavandula-angustifolia-compacta/details" name="twitter:url"><meta content="@The_RHS" name="twitter:creator"><meta content="Lavandula angustifolia 'Compacta' | English lavender 'Compacta'" name="twitter:title"><meta content="Find help &#38; information on Lavandula angustifolia 'Compacta' | English lavender 'Compacta' from the RHS" name="twitter:description"><meta content="https://www.rhs.org.uk/ui-assets/rhs-logo-icon.svg" name="twitter:image"><meta content="Lavandula angustifolia 'Compacta' | English lavender 'Compacta'" name="twitter:image:alt"><meta content="https://www.rhs.org.uk" name="twitter:domain"><link href="https://www.rhs.org.uk/plants/9887/lavandula-angustifolia-compacta/details" rel="canonical"><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://www.rhs.org.uk/plants/9887/lavandula-angustifolia-compacta/details","url":"https://www.rhs.org.uk/plants/9887/lavandula-angustifolia-compacta/details","name":"Lavandula angustifolia 'Compacta' | English lavender 'Compacta'","description":"Find help \u0026 information on Lavandula angustifolia 'Compacta' | English lavender 'Compacta' from the RHS","about":{"@id":"https://www.rhs.org.uk/plants/9887/lavandula-angustifolia-compacta/details#taxon"},"publisher":{"@type":"Organization","name":"Royal Horticultural Society"}},{"@type":"Taxon","@id":"https://www.rhs.org.uk/plants/9887/lavandula-angustifolia-compacta/details#taxon","identifier":"9887","name":"Lavandula angustifolia 'Compacta'","alternateName":["English lavender 'Compacta'","Lavandula angustifolia 'Nana Compacta'"],"description":"Find help \u0026 information on Lavandula angustifolia 'Compacta' | English lavender 'Compacta' from the RHS","url":"https://www.rhs.org.uk/plants/9887/lavandula-angustifolia-compacta/details","mainEntityOfPage":"https://www.rhs.org.uk/plants/9887/lavandula-angustifolia-compacta/details","parentTaxon":{"@type":"Taxon","name":"Lavandula","taxonRank":"genus","parentTaxon":{"@type":"Taxon","name":"Lamiaceae","taxonRank":"family"}}}]}</script><link href="/favicon.ico" rel="icon" type="image/x-icon"><link href="/ui-assets/rhs-logo-144x144.png" rel="apple-touch-icon" sizes="144x144"><link rel="stylesheet" href="/_astro/inspiration.CBIhYO5m.css">
+<link rel="stylesheet" href="/_astro/callback.Ceo-tdqj.css">
+<link rel="stylesheet" href="/_astro/index.DCpPI5wa.css">
+<link rel="stylesheet" href="/_astro/details.CluI29lW.css">
+<style>/*! tailwindcss v4.2.2 | MIT License | https://tailwindcss.com */@layer properties{@supports (((-webkit-hyphens:none)) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))){*,:before,:after,::backdrop{--tw-font-weight:initial;--tw-shadow:0 0 #0000;--tw-shadow-color:initial;--tw-shadow-alpha:100%;--tw-inset-shadow:0 0 #0000;--tw-inset-shadow-color:initial;--tw-inset-shadow-alpha:100%;--tw-ring-color:initial;--tw-ring-shadow:0 0 #0000;--tw-inset-ring-color:initial;--tw-inset-ring-shadow:0 0 #0000;--tw-ring-inset:initial;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-offset-shadow:0 0 #0000}}}.breadcrumb[data-astro-cid-64kmezq4]{font-family:var(--font-open-sans),Open Sans Fallback,Open Sans Fallback Roboto,Arial,sans-serif;color:var(--color-primary-dark-brown,#3b3630)}.breadcrumb--inverse[data-astro-cid-64kmezq4]{color:var(--color-white,#fff)}.breadcrumb__list[data-astro-cid-64kmezq4]{flex-wrap:wrap;align-items:center;margin:0;padding:0;list-style-type:none;display:flex}.breadcrumb__item[data-astro-cid-64kmezq4]{height:31px;font-size:1.0625rem;line-height:var(--tw-leading,1.6875rem);align-items:center;display:flex}.breadcrumb__item[data-astro-cid-64kmezq4]:not(:last-child){display:none}@media (min-width:744px){.breadcrumb__item[data-astro-cid-64kmezq4]:not(:last-child){display:flex}}.breadcrumb__item[data-astro-cid-64kmezq4]:last-child{display:flex}.breadcrumb__item--current[data-astro-cid-64kmezq4]{--tw-font-weight:650;color:var(--color-white,#fff);font-weight:650}.breadcrumb__link[data-astro-cid-64kmezq4]{color:currentColor;text-underline-offset:6px;transition-property:all;transition-timing-function:var(--tw-ease,var(--default-transition-timing-function,cubic-bezier(.4, 0, .2, 1)));transition-duration:var(--tw-duration,var(--default-transition-duration,.15s));--tw-outline-style:none;outline-style:none;text-decoration-line:underline;text-decoration-color:#0000;text-decoration-thickness:1px}@media (hover:hover){.breadcrumb__link[data-astro-cid-64kmezq4]:hover{color:currentColor;text-decoration-color:currentColor}}.breadcrumb__link[data-astro-cid-64kmezq4]:focus-visible{--tw-ring-shadow:var(--tw-ring-inset,) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color,currentcolor);box-shadow:var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow);--tw-ring-color:var(--color-primary-blue)}.breadcrumb__separator[data-astro-cid-64kmezq4]{color:currentColor;align-items:center;margin-inline:1rem;display:none}@media (min-width:744px){.breadcrumb__separator[data-astro-cid-64kmezq4]{display:flex}}.breadcrumb__separator--back[data-astro-cid-64kmezq4]{margin-left:0;margin-right:1rem;display:flex}@media (min-width:744px){.breadcrumb__separator--back[data-astro-cid-64kmezq4]{display:none}}@property --tw-font-weight{syntax:"*";inherits:false}@property --tw-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-shadow-color{syntax:"*";inherits:false}@property --tw-shadow-alpha{syntax:"<percentage>";inherits:false;initial-value:100%}@property --tw-inset-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-inset-shadow-color{syntax:"*";inherits:false}@property --tw-inset-shadow-alpha{syntax:"<percentage>";inherits:false;initial-value:100%}@property --tw-ring-color{syntax:"*";inherits:false}@property --tw-ring-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-inset-ring-color{syntax:"*";inherits:false}@property --tw-inset-ring-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-ring-inset{syntax:"*";inherits:false}@property --tw-ring-offset-width{syntax:"<length>";inherits:false;initial-value:0}@property --tw-ring-offset-color{syntax:"*";inherits:false;initial-value:#fff}@property --tw-ring-offset-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}
+/*! tailwindcss v4.2.2 | MIT License | https://tailwindcss.com */@layer properties{@supports (((-webkit-hyphens:none)) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))){*,:before,:after,::backdrop{--tw-border-style:solid;--tw-shadow:0 0 #0000;--tw-shadow-color:initial;--tw-shadow-alpha:100%;--tw-inset-shadow:0 0 #0000;--tw-inset-shadow-color:initial;--tw-inset-shadow-alpha:100%;--tw-ring-color:initial;--tw-ring-shadow:0 0 #0000;--tw-inset-ring-color:initial;--tw-inset-ring-shadow:0 0 #0000;--tw-ring-inset:initial;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-offset-shadow:0 0 #0000}}}.form-input[data-astro-cid-azdzk2aw]{border-radius:var(--radius-md,.375rem);border-style:var(--tw-border-style);border-width:1px;border-color:var(--color-secondary-form-border-grey,#acacac);background-color:var(--color-white,#fff);width:100%;height:55px;font-family:var(--font-open-sans),Open Sans Fallback,Open Sans Fallback Roboto,Arial,sans-serif;font-size:.9375rem;line-height:var(--tw-leading,1.5rem);--tw-outline-style:none;outline-style:none;padding-block:.5rem;padding-inline:.75rem}.form-input[data-astro-cid-azdzk2aw]:focus-visible{--tw-ring-shadow:var(--tw-ring-inset,) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color,currentcolor);box-shadow:var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow);--tw-ring-color:var(--color-primary-blue)}.form-input--small[data-astro-cid-azdzk2aw]{border-radius:var(--radius-md,.375rem);border-style:var(--tw-border-style);border-width:1px;border-color:var(--color-secondary-form-border-grey,#acacac);background-color:var(--color-white,#fff);width:100%;height:2rem;font-family:var(--font-open-sans),Open Sans Fallback,Open Sans Fallback Roboto,Arial,sans-serif;font-size:.9375rem;line-height:var(--tw-leading,1.5rem);--tw-outline-style:none;outline-style:none;padding-inline:.75rem}.form-input--small[data-astro-cid-azdzk2aw]:focus-visible{--tw-ring-shadow:var(--tw-ring-inset,) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color,currentcolor);box-shadow:var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow);--tw-ring-color:var(--color-primary-blue)}@property --tw-border-style{syntax:"*";inherits:false;initial-value:solid}@property --tw-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-shadow-color{syntax:"*";inherits:false}@property --tw-shadow-alpha{syntax:"<percentage>";inherits:false;initial-value:100%}@property --tw-inset-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-inset-shadow-color{syntax:"*";inherits:false}@property --tw-inset-shadow-alpha{syntax:"<percentage>";inherits:false;initial-value:100%}@property --tw-ring-color{syntax:"*";inherits:false}@property --tw-ring-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-inset-ring-color{syntax:"*";inherits:false}@property --tw-inset-ring-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-ring-inset{syntax:"*";inherits:false}@property --tw-ring-offset-width{syntax:"<length>";inherits:false;initial-value:0}@property --tw-ring-offset-color{syntax:"*";inherits:false;initial-value:#fff}@property --tw-ring-offset-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}
+/*! tailwindcss v4.2.2 | MIT License | https://tailwindcss.com */@layer properties{@supports (((-webkit-hyphens:none)) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))){*,:before,:after,::backdrop{--tw-border-style:solid}}}.spinner[data-astro-cid-lolztsa2]{justify-content:center;align-items:center;padding:2rem;display:flex}.spinner__indicator[data-astro-cid-lolztsa2]{animation:var(--animate-spin,spin 1s linear infinite);--tw-border-style:solid;border-style:solid;border-color:var(--color-secondary-lighter-green,#daefdb);border-top-color:var(--color-primary-dark-green,#006e50);border-radius:3.40282e38px;display:block}.spinner__indicator--small[data-astro-cid-lolztsa2]{border-style:var(--tw-border-style);border-width:2px;width:1.5rem;height:1.5rem}.spinner__indicator--medium[data-astro-cid-lolztsa2]{border-style:var(--tw-border-style);border-width:3px;width:2.5rem;height:2.5rem}.spinner__indicator--large[data-astro-cid-lolztsa2]{border-style:var(--tw-border-style);border-width:4px;width:3rem;height:3rem}@property --tw-border-style{syntax:"*";inherits:false;initial-value:solid}@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+<link rel="stylesheet" href="/_astro/details.C1HNeMKS.css">
+<style>/*! tailwindcss v4.2.2 | MIT License | https://tailwindcss.com */@layer properties{@supports (((-webkit-hyphens:none)) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))){*,:before,:after,::backdrop{--tw-shadow:0 0 #0000;--tw-shadow-color:initial;--tw-shadow-alpha:100%;--tw-inset-shadow:0 0 #0000;--tw-inset-shadow-color:initial;--tw-inset-shadow-alpha:100%;--tw-ring-color:initial;--tw-ring-shadow:0 0 #0000;--tw-inset-ring-color:initial;--tw-inset-ring-shadow:0 0 #0000;--tw-ring-inset:initial;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-offset-shadow:0 0 #0000}}}.plant-recognition-badge[data-astro-cid-374tq3oy]{--tw-outline-style:none;outline-style:none}.plant-recognition-badge[data-astro-cid-374tq3oy]:focus-visible{--tw-ring-shadow:var(--tw-ring-inset,) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color,currentcolor);box-shadow:var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow);--tw-ring-color:var(--color-primary-blue)}.plant-recognition-badge__image[data-astro-cid-374tq3oy]{width:85px;height:85px}.plant-recognition-badge__image--compact[data-astro-cid-374tq3oy]{width:60px;height:60px}@media (min-width:1133px){.plant-recognition-badge__image--compact[data-astro-cid-374tq3oy]{width:85px;height:85px}}@property --tw-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-shadow-color{syntax:"*";inherits:false}@property --tw-shadow-alpha{syntax:"<percentage>";inherits:false;initial-value:100%}@property --tw-inset-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-inset-shadow-color{syntax:"*";inherits:false}@property --tw-inset-shadow-alpha{syntax:"<percentage>";inherits:false;initial-value:100%}@property --tw-ring-color{syntax:"*";inherits:false}@property --tw-ring-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-inset-ring-color{syntax:"*";inherits:false}@property --tw-inset-ring-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-ring-inset{syntax:"*";inherits:false}@property --tw-ring-offset-width{syntax:"<length>";inherits:false;initial-value:0}@property --tw-ring-offset-color{syntax:"*";inherits:false;initial-value:#fff}@property --tw-ring-offset-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}
+</style>
+<link rel="stylesheet" href="/_astro/plant_guide.AojuVMUs.css">
+<link rel="stylesheet" href="/_astro/details.Bd5Tff-8.css">
+<link rel="stylesheet" href="/_astro/advice.4zbiQ2_-.css">
+<link rel="stylesheet" href="/_astro/grow_your_own.CzbNGOSd.css">
+<link rel="stylesheet" href="/_astro/advice.Bk0fl_-J.css"></head> <body data-kai-smart-link="false" data-kontent-environment-id="05836e9f-2692-012f-b4fe-e3f22d127fa9" data-kontent-language-codename="en-GB"> <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-5GZXDJDF&gtm_cookies_win=x" style="display:none;visibility:hidden" title="Google Tag Manager (noscript)" width="0"></iframe></noscript> <header class="header-scope" data-astro-cid-3ef6ksr2> <div class="js-header-global" data-astro-cid-3ef6ksr2> <div class="site-header" data-astro-cid-3ef6ksr2> <div class="wrapper" data-astro-cid-3ef6ksr2> <div class="l-row l-row--flex l-row-xs--center flex items-center" data-astro-cid-3ef6ksr2> <div class="l-col-xs-3 l-col-sm-5" data-astro-cid-3ef6ksr2> <div class="l-module" data-astro-cid-3ef6ksr2> <a class="site-header__logo focus-ring" data-link-name="navigation|logo|Home|image" data-test="logo" href="/" data-astro-cid-3ef6ksr2="true"> <span class="site-logo site-logo--fluid" data-astro-cid-3ef6ksr2></span> <span class="sr-only" data-astro-cid-3ef6ksr2>Home</span> </a> </div> </div> <div class="l-col-xs-9 l-col-sm-7" data-astro-cid-3ef6ksr2> <div class="l-module" data-astro-cid-3ef6ksr2> <div class="site-header__toolbar" data-astro-cid-3ef6ksr2> <div class="toolbar toolbar--primary" data-astro-cid-3ef6ksr2> <ul class="toolbar__list hidden-xs hidden-sm hidden-md" data-astro-cid-3ef6ksr2> <li class="toolbar__list-item toolbar__list-item--search" data-astro-cid-3ef6ksr2> <div class="search-form" data-test="search-bar" data-astro-cid-3ef6ksr2></div> </li> <li class="toolbar__list-item" data-astro-cid-3ef6ksr2> <a class="btn btn--medium btn--with-icon btn--icon-right form-btn form-btn--tone-alert u-m-b-0 u-m-l-2" href="/join" data-ga data-link-name="navigation|cta|Become a member|button" data-thx-name="join-button-heading" data-astro-cid-3ef6ksr2="true" data-astro-cid-vnzlvqnm="true"><span class="btn__text" data-js="button-text" data-astro-cid-vnzlvqnm>
+Become a member
+</span> <span aria-hidden="true" class="btn__icon btn__icon--right" data-astro-cid-vnzlvqnm><svg width="16" height="16" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" class="svg-inline--fa fa-angle-right" role="img" viewBox="0 0 256 512"><path fill="currentColor" d="M247.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L179.2 256 41.9 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg></span></a>  </li> </ul> <ul class="toolbar__list hidden-lg" data-astro-cid-3ef6ksr2> <li class="toolbar__list-item" data-astro-cid-3ef6ksr2> <a class="nav-form-button nav-form-button--nav nav-form-button--fw js-mobile-nav-toggle focus-ring" href="#mobile-nav-menu" data-astro-cid-3ef6ksr2><span class="sr-only" data-astro-cid-3ef6ksr2>Menu</span></a> </li> <li class="toolbar__list-item" data-astro-cid-3ef6ksr2> <a class="nav-form-button nav-form-button--action nav-form-button--search nav-form-button--fw js-mobile-nav-toggle focus-ring" href="#mobile-nav-search" data-astro-cid-3ef6ksr2><span class="sr-only" data-astro-cid-3ef6ksr2>Search</span></a> </li> <!--<li class="toolbar__list-item"><a href="#" class="nav-form-button nav-form-button--myrhs">My RHS</a></li>--> <li class="toolbar__list-item hidden-md" data-astro-cid-3ef6ksr2> <a class="btn btn--medium btn--with-icon btn--icon-right button u-m-b-0" href="/join" data-ga data-link-name="navigation|cta|Membership|button" data-astro-cid-3ef6ksr2="true" data-astro-cid-vnzlvqnm="true"><span class="btn__text" data-js="button-text" data-astro-cid-vnzlvqnm>
+Membership
+</span> <span aria-hidden="true" class="btn__icon btn__icon--right" data-astro-cid-vnzlvqnm><svg width="16" height="16" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" class="svg-inline--fa fa-angle-right" role="img" viewBox="0 0 256 512"><path fill="currentColor" d="M247.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L179.2 256 41.9 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg></span></a>  </li> <li class="toolbar__list-item hidden-xs hidden-sm" data-astro-cid-3ef6ksr2> <a class="btn btn--medium btn--with-icon btn--icon-right button u-m-b-0" href="/join" data-ga data-link-name="navigation|cta|Become a member|button" data-astro-cid-3ef6ksr2="true" data-astro-cid-vnzlvqnm="true"><span class="btn__text" data-js="button-text" data-astro-cid-vnzlvqnm>
+Become a member
+</span> <span aria-hidden="true" class="btn__icon btn__icon--right" data-astro-cid-vnzlvqnm><svg width="16" height="16" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" class="svg-inline--fa fa-angle-right" role="img" viewBox="0 0 256 512"><path fill="currentColor" d="M247.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L179.2 256 41.9 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg></span></a>  </li> </ul> </div> </div> </div> </div> </div> </div> </div> <nav class="nav-site js-nav-site" data-test="main-navigation" title="nav"> <div class="nav-site__outer"> <div class="nav-site__wrapper"> <ul class="nav-site__list nav-site__list--alt" role="menubar"> <li class="nav-site__item" role="none"> <a class="nav-site__link nav-site__link--home" data-link-name="navigation|home|Home|image" href="/" role="menuitem"> <span class="hidden-accessible">Home</span> </a> </li> <li class="nav-site__item hidden-lg" role="none"> <a class="nav-site__link nav-site__link--nav js-mobile-nav-toggle" href="#mobile-nav-menu" role="menuitem"> <span class="hidden-accessible">Menu</span> </a> </li> <li class="nav-site__item hidden-lg" role="none"> <a class="nav-site__link nav-site__link--search js-mobile-nav-toggle" href="#mobile-nav-search" role="menuitem"> <span class="hidden-accessible">Search</span> </a> </li> </ul> <ul class="nav-site__list" role="menubar"> <li class="nav-site__item" role="none"> <a aria-expanded="false" aria-haspopup="true" class="nav-site__link js-mega-menu-toggle" data-test="mega-menu-toggle" href="#nav-get-involved" rel="mega_getInvolved" role="menuitem">
+Get involved
+</a> </li> <li class="nav-site__item" role="none"> <a aria-expanded="false" aria-haspopup="true" class="nav-site__link js-mega-menu-toggle" data-test="mega-menu-toggle" href="#nav-gardening" rel="mega_Gardening" role="menuitem">
+Gardening
+</a> </li> <li class="nav-site__item" role="none"> <a aria-expanded="false" aria-haspopup="true" class="nav-site__link js-mega-menu-toggle" data-test="mega-menu-toggle" href="#nav-shows" rel="mega_Shows" role="menuitem">
+Shows
+</a> </li> <li class="nav-site__item" role="none"> <a aria-expanded="false" aria-haspopup="true" class="nav-site__link js-mega-menu-toggle" data-test="mega-menu-toggle" href="#nav-gardens" rel="mega_Gardens" role="menuitem">
+Gardens
+</a> </li> <li class="nav-site__item" role="none"> <a aria-expanded="false" aria-haspopup="true" class="nav-site__link js-mega-menu-toggle" data-test="mega-menu-toggle" href="#nav-learn" rel="mega_Learn" role="menuitem">
+Learn
+</a> </li> <li class="nav-site__item" role="none"> <a aria-expanded="false" aria-haspopup="true" class="nav-site__link js-mega-menu-toggle" data-test="mega-menu-toggle" href="#nav-science" rel="mega_Science" role="menuitem">
+Science
+</a> </li> <li class="nav-site__item" role="none"> <a aria-expanded="false" aria-haspopup="true" class="nav-site__link js-mega-menu-toggle" data-test="mega-menu-toggle" href="#nav-shop" rel="mega_Shop" role="menuitem">
+Shop
+</a> </li> </ul> <ul class="nav-site__list nav-site__list--ext" role="menubar"> <li class="nav-site__item" role="none"> <a aria-expanded="false" aria-haspopup="true" class="nav-site__link js-mega-menu-toggle" data-test="mega-menu-toggle" href="#nav-about" rel="nav-my-rhs" role="menuitem">
+About
+</a> </li> <li class="nav-site__item" role="none"> <a class="nav-site__link nav-site__link--user" data-link-name="navigation|my-rhs|My RHS|text" href="/my-rhs" role="menuitem">
+My RHS
+</a> </li> </ul> <div class="nav-site__toolbar"> <div class="toolbar toolbar--sticky"> <ul class="toolbar__list" role="menubar"> <li class="toolbar__list-item hidden-md hidden-lg" role="none"> <a class="nav-form-button nav-form-button--join" data-link-name="header|sticky|Membership|text" data-thx-name="join-button-heading" href="/join" role="menuitem">
+Membership
+</a> </li> <li class="toolbar__list-item hidden-xs hidden-sm" role="none"> <a class="nav-form-button nav-form-button--join u-m-b-0" data-link-name="header|sticky|Become a member|text" data-thx-name="join-button-heading" href="/join" role="menuitem">
+Become a member
+</a> </li> </ul> </div> </div> </div> </div> <div class="mobile-nav" id="mobile-nav"> <div class="mobile-nav__outer"> <div class="mobile-nav__inner">  <div><div class="mobile-nav__panel js-mobile-nav-panel" data-type="menu" id="mobile-nav-menu" role="navigation" aria-label="Mobile navigation">
+    <ul class="mobile-nav__group is-active" role="menu">
+        <li class="mobile-nav__item mobile-nav__item--half" role="none">
+            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__root" href="/">Home</a>
+        </li>
+
+        <li class="mobile-nav__item mobile-nav__item--half" role="none">
+            <a role="menuitem" data-ga-link-type="image-and-text" data-ga-component-name="mega-menu" href="/my-rhs" class="mobile-nav__root mobile-nav__root--haschild mobile-nav__root--action">My RHS <i class="rhs-icon rhs-icon-user" aria-hidden="true"></i></a>
+        </li>
+
+        <li role="none">
+            <a class="mobile-nav__root mobile-nav__root--haschild js-mobile-nav-forward" href="#" role="menuitem" aria-haspopup="true" aria-expanded="false">Get involved with the RHS</a>
+            <ul class="mobile-nav__group mobile-nav__group--1" role="menu">
+                <li role="none">
+                    <a class="mobile-nav__sub mobile-nav__sub--back js-mobile-nav-back" href="#" role="menuitem">Back</a>
+                </li>
+                <li role="none">
+                    <a class="mobile-nav__root mobile-nav__root--haschild js-mobile-nav-forward" href="#" role="menuitem" aria-haspopup="true" aria-expanded="false">Take action</a>
+                    <ul class="mobile-nav__group mobile-nav__group--2" role="menu">
+                        <li role="none">
+                            <a class="mobile-nav__sub mobile-nav__sub--back js-mobile-nav-back" href="#" role="menuitem">Back</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/get-involved">Get involved with RHS</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/education-learning/careers-horticulture/horticulture-matters">Horticulture Matters</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/get-involved/wild-about-gardens">Wild About Gardens</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/get-involved/national-gardening-week/">National Gardening Week</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/get-involved/schools">Schools</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/get-involved/volunteer">Volunteer</a>
+                        </li>
+                    </ul>
+                </li>
+                <li role="none">
+                    <a class="mobile-nav__root mobile-nav__root--haschild js-mobile-nav-forward" href="#" role="menuitem" aria-haspopup="true" aria-expanded="false">Communities</a>
+                    <ul class="mobile-nav__group mobile-nav__group--2" role="menu">
+                        <li role="none">
+                            <a class="mobile-nav__sub mobile-nav__sub--back js-mobile-nav-back" href="#" role="menuitem">Back</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/get-involved/community-gardening">Community gardening</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/get-involved/britain-in-bloom">Britain in Bloom</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/get-involved/its-your-neighbourhood">It's Your Neighbourhood</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/get-involved/community-gardening/outreach">Community Outreach</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/get-involved/schools">Campaign for School Gardening</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/get-involved/affiliated-societies">Affiliated Societies</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub mobile-nav__sub--search text-highlight" href="/get-involved/find-a-group">Find a local gardening group</a>
+                        </li>
+                    </ul>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub mobile-nav__sub--haschild" href="/join">Join the RHS</a> 
+                    <a role="menuitem" class="mobile-nav__sub mobile-nav__sub--forward js-mobile-nav-forward" href="#"></a>
+                    <ul class="mobile-nav__group mobile-nav__group--2" role="menu">
+                        <li role="none">
+                            <a class="mobile-nav__sub mobile-nav__sub--back js-mobile-nav-back" href="#" role="menuitem">Back</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/join#join-individual">Individual &amp; Joint membership</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/join#join-gift">Gift</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/join#join-life">Life &amp; Senior Life</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/membership/rhs-student-membership">Students</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/about-us/support-us/rhs-patrons">RHS Patrons</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/membership/faqs">About membership</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="https://support.rhs.org.uk/giftpackactivation/activate.aspx" rel="noopener noreferrer" target="_blank">Activate gift membership</a>
+                        </li>
+                    </ul>
+                </li>
+                <li role="none">
+                    <a class="mobile-nav__root mobile-nav__root--haschild js-mobile-nav-forward" href="#" role="menuitem" aria-haspopup="true" aria-expanded="false">Support us</a>
+                    <ul class="mobile-nav__group mobile-nav__group--2" role="menu">
+                        <li role="none">
+                            <a class="mobile-nav__sub mobile-nav__sub--back js-mobile-nav-back" href="#" role="menuitem">Back</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/about-us/support-us/making-a-donation">Donate</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/about-us/careers">Careers</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/about-us/commercial-opportunities">Commercial</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/about-us/support-us/leave-a-gift-in-your-will">Leave a gift in your will</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/about-us/commercial-opportunities/corporate-partnerships">Sponsorship and Partner opportunities</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li role="none">
+            <a class="mobile-nav__root mobile-nav__root--haschild js-mobile-nav-forward" href="#" role="menuitem" aria-haspopup="true" aria-expanded="false">Gardening</a>
+            <ul class="mobile-nav__group mobile-nav__group--1" role="menu">
+                <li role="none">
+                    <a class="mobile-nav__sub mobile-nav__sub--back js-mobile-nav-back" href="#" role="menuitem">Back</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" class="mobile-nav__sub" href="/gardening">Gardening with the RHS</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" class="mobile-nav__sub" href="/rhsgrow">RHS Grow app</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub mobile-nav__sub--haschild" href="/plants">Plants</a>
+                    <a role="menuitem" class="mobile-nav__sub mobile-nav__sub--forward js-mobile-nav-forward" href="#"></a>
+                    <ul class="mobile-nav__group mobile-nav__group--2" role="menu">
+                        <li role="none">
+                            <a class="mobile-nav__sub mobile-nav__sub--back js-mobile-nav-back" href="#" role="menuitem">Back</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub mobile-nav__sub--search" href="/plants/search-form">Find a plant</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/plants/popular">Popular plants</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/plants/types/houseplants">Houseplants</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/plants/types">Plants by type</a>
+                        </li>
+                        
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub mobile-nav__sub--external" href="https://www.rhsplants.co.uk/" rel="noopener noreferrer" target="_blank">Buy plants online</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/plants/trials-awards">RHS trials &amp; awards</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/plants/horticulture-hub">Horticulture Hub</a>
+                        </li>
+                    </ul>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub mobile-nav__sub--haschild" href="/advice">Advice</a>
+                    <a role="menuitem" class="mobile-nav__sub mobile-nav__sub--forward js-mobile-nav-forward" href="#"></a>
+                    <ul class="mobile-nav__group mobile-nav__group--2" role="menu">
+                        <li role="none">
+                            <a class="mobile-nav__sub mobile-nav__sub--back js-mobile-nav-back" href="#" role="menuitem">Back</a>
+                        </li>
+                        <li role="none" class="mobile-nav__sub mobile-nav__sub--search">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" href="/advice/advice-search">Search all advice</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/advice/grow-your-own">Grow Your Own</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/advice/in-month">This month</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/advice/advice-search?keywords=problems%20pests%20disease">Problems, pests &amp; diseases</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/advice/beginners-guide">Beginners' guide</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/garden-design">Garden design</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/gardening-for-the-environment">Gardening for the environment</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/wildlife">Wildlife gardening</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/advice/health-and-wellbeing">Health &amp; wellbeing</a>
+                        </li>
+                    </ul>
+                </li>
+                <li role="none">
+                    <a role="menuitem" class="mobile-nav__sub" href="/my-rhs">My Garden</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/garden-inspiration">Browse inspiration articles</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub mobile-nav__sub--external" href="https://www.rhsplants.co.uk/" rel="noopener noreferrer" target="_blank">Buy plants online</a>
+                </li>
+            </ul>
+        </li>
+        <li role="none">
+            <a class="mobile-nav__root mobile-nav__root--haschild js-mobile-nav-forward" href="#" role="menuitem" aria-haspopup="true" aria-expanded="false">Shows</a>
+            <ul class="mobile-nav__group mobile-nav__group--1" role="menu">
+                <li role="none">
+                    <a class="mobile-nav__sub mobile-nav__sub--back js-mobile-nav-back" href="#" role="menuitem">Back</a>
+                </li>
+                
+                
+                
+               
+				
+				
+                
+                
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/shows-events/rhs-botanical-art-and-photography-show">RHS Botanical Art and Photography Show <small>— 19 June – 2 August 2026</small></a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/shows-events/rhs-badminton-flower-show">RHS Badminton Flower Show <small>— 8-12 July 2026</small></a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/shows-events/rhs-sandringham-flower-show">RHS Sandringham Flower Show <small>— 22-26 July 2026</small></a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/gardens/hyde-hall/rhs-garden-hyde-hall-flower-show">RHS Hyde Hall Flower Show <small>— 5-9 August 2026</small></a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/gardens/wisley/rhs-garden-wisley-flower-show">RHS Wisley Flower Show <small>— 1-6 September 2026</small></a>
+                </li>
+				<li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/shows-events/malvern-autumn-show">Malvern Autumn Show <small>— 25-27 September 2026</small></a>
+                </li>
+				<li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/shows-events/malvern-spring-festival">RHS Malvern Spring Festival <small>— 6-9 May 2027</small></a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/shows-events/rhs-chelsea-flower-show">RHS Chelsea Flower Show <small>— 18-22 May 2027</small></a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/shows-events/exhibit-at-a-show">Exhibit at a show</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/shows-events/event-search">See all RHS events</a>
+                </li>
+
+            </ul>
+        </li>
+        <li role="none">
+            <a class="mobile-nav__root mobile-nav__root--haschild js-mobile-nav-forward" href="#" role="menuitem" aria-haspopup="true" aria-expanded="false">Gardens</a>
+            <ul class="mobile-nav__group mobile-nav__group--1" role="menu">
+                <li role="none">
+                    <a class="mobile-nav__sub mobile-nav__sub--back js-mobile-nav-back" href="#" role="menuitem">Back</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/gardens">RHS Gardens</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/gardens/bridgewater">RHS Bridgewater, Greater Manchester</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/gardens/harlow-carr">RHS Harlow Carr, Yorkshire</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/gardens/hyde-hall">RHS Hyde Hall, Essex</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/gardens/rosemoor">RHS Rosemoor, Devon</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/gardens/wisley">RHS Wisley, Surrey</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/gardens/partner-gardens">RHS Partner Gardens</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/shows-events">RHS Flower Shows</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub mobile-nav__sub--search" href="/gardens/search-form">Find a garden</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/shows-events/event-search">What’s on</a>
+                </li>
+            </ul>
+        </li>
+        <li role="none">
+            <a class="mobile-nav__root mobile-nav__root--haschild js-mobile-nav-forward" href="#" role="menuitem" aria-haspopup="true" aria-expanded="false">Learn</a>
+            <ul class="mobile-nav__group mobile-nav__group--1" role="menu">
+                <li role="none">
+                    <a class="mobile-nav__sub mobile-nav__sub--back js-mobile-nav-back" href="#" role="menuitem">Back</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub mobile-nav__sub--haschild" href="/education-learning">Learning</a>
+                    <a role="menuitem" class="mobile-nav__sub mobile-nav__sub--forward js-mobile-nav-forward" href="#"></a>
+                    <ul class="mobile-nav__group mobile-nav__group--2" role="menu">
+                        <li role="none">
+                            <a class="mobile-nav__sub mobile-nav__sub--back js-mobile-nav-back" href="#" role="menuitem">Back</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/education-learning/courses-workshops">Courses &amp; Workshops</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/education-learning/bursaries-grants">Bursaries</a>
+                        </li>
+                        
+						<li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/education-learning/school-gardening">Schools</a>
+                        </li>
+						<li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/education-learning/children-young-people">Children and young people</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/education-learning/libraries">RHS Libraries</a>
+                        </li>
+                    </ul>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub mobile-nav__sub--haschild" href="/education-learning/qualifications-and-training">Qualifications &amp; training</a>
+                    <a role="menuitem" class="mobile-nav__sub mobile-nav__sub--forward js-mobile-nav-forward" href="#"></a>
+                    <ul class="mobile-nav__group mobile-nav__group--2" role="menu">
+                        <li role="none">
+                            <a class="mobile-nav__sub mobile-nav__sub--back js-mobile-nav-back" href="#" role="menuitem">Back</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/education-learning/careers-horticulture">Grow careers</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/education-learning/qualifications-and-training/rhs-qualifications">RHS Qualifications</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/education-learning/qualifications-and-training/rhs-qualifications/find-a-centre">Find an approved centre</a>
+                        </li>
+
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/education-learning/qualifications-and-training/work-based-training">Work-based training</a>
+                        </li>
+                        <li role="none">
+                            <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/education-learning/qualifications-and-training/master-of-horticulture">Master of Horticulture</a>
+                        </li>
+                    </ul>
+
+
+
+
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/education-learning/careers">Grow Careers</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/shows-events/event-search">Courses calendar</a>
+                </li>
+                
+            </ul>
+        </li>
+        <li role="none">
+            <a class="mobile-nav__root mobile-nav__root--haschild js-mobile-nav-forward" href="#" role="menuitem" aria-haspopup="true" aria-expanded="false">Science</a>
+            <ul class="mobile-nav__group mobile-nav__group--1" role="menu">
+                <li role="none">
+                    <a class="mobile-nav__sub mobile-nav__sub--back js-mobile-nav-back" href="#" role="menuitem">Back</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/science">RHS Science &amp; Collections</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/science/research">Research areas</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/science/meet-the-team">Meet the team</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/science/help-our-research">Help our research</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/science/conservation-biodiversity/conserving-garden-plants/rhs-herbarium">Herbarium</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/science/events">What’s on</a>
+                </li>
+            </ul>
+        </li>
+        <li role="none">
+            <a class="mobile-nav__root mobile-nav__root--haschild js-mobile-nav-forward" href="#" role="menuitem" aria-haspopup="true" aria-expanded="false">Shop</a>
+            <ul class="mobile-nav__group mobile-nav__group--1" role="menu">
+                <li role="none">
+                    <a class="mobile-nav__sub mobile-nav__sub--back js-mobile-nav-back" href="#" role="menuitem">Back</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/shop">Visit the RHS shop</a>
+                </li>
+                
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub mobile-nav__sub--external" href="https://www.rhsplants.co.uk/" target="_blank" rel="noopener noreferrer">Shop plants — <span class="text-xs">rhsplants.co.uk</span></a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub mobile-nav__sub--external" href="http://www.rhsprints.co.uk/" target="_blank" rel="noopener noreferrer">Shop prints — <span class="text-xs">rhsprints.co.uk</span></a>
+                </li>
+				<li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub mobile-nav__sub--external" href="https://www.rhsplants.co.uk/rhs-gifting/" target="_blank" rel="noopener noreferrer">RHS Gifting — <span class="text-xs">rhsplants.co.uk</span></a>
+                </li>
+               
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/shop/vouchers">Gift cards and vouchers</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/offers">Special offers</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/shop/garden-centres">Our shops &amp; garden centres</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/shop/licensed-products">Other stockists</a>
+                </li>
+            </ul>
+        </li>
+        <li role="none">
+            <a class="mobile-nav__root mobile-nav__root--haschild js-mobile-nav-forward" href="#" role="menuitem" aria-haspopup="true" aria-expanded="false">About us</a>
+            <ul class="mobile-nav__group mobile-nav__group--1" role="menu">
+                <li role="none">
+                    <a href="#" class="mobile-nav__sub mobile-nav__sub--back js-mobile-nav-back" role="menuitem">Back</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" href="/about-us" class="mobile-nav__sub">About us</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" href="/about-us/what-we-do" class="mobile-nav__sub">What we do</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" href="/about-us/our-people" class="mobile-nav__sub">Our people</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" href="/about-us/support-us" class="mobile-nav__sub">Support us</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" href="/about-us/careers" class="mobile-nav__sub">Careers</a>
+                </li>
+                <li role="none">
+                    <a role="menuitem" href="/about-us/commercial-opportunities" class="mobile-nav__sub">Commercial</a>
+                </li>
+            </ul>
+        </li>
+        <li role="none">
+            <a class="mobile-nav__root mobile-nav__root--haschild js-mobile-nav-forward" href="#" role="menuitem" aria-haspopup="true" aria-expanded="false">My RHS <i class="rhs-icon rhs-icon-user" aria-hidden="true"></i></a>
+            <ul class="mobile-nav__group mobile-nav__group--1" role="menu">
+                <li role="none"><a href="#" class="mobile-nav__sub mobile-nav__sub--back js-mobile-nav-back" role="menuitem">Back</a></li>
+                <li role="none">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub mobile__Login__logout" href="/auth/login">Log in</a>
+                </li>
+                <li role="none" class="mobile__Register">
+                    <a role="menuitem" data-ga-link-type="text" data-ga-component-name="mega-menu" class="mobile-nav__sub" href="/register">Register</a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div></div> <div class="mobile-nav__panel js-mobile-nav-panel" data-type="panel" id="mobile-nav-search"> <div class="nav-dropdown"> <div class="wrapper"> <div class="toolbar toolbar--sticky-search"> <div class="l-row"> <div class="l-col-xs-12 l-col-sm-12 l-col-md-8 l-col-centered"> <div class="search-form-mobile"></div> </div> </div> </div> </div> </div> </div> </div> </div> </div> <div class="mega-menu" id="mega-menu"> <div class="mega-menu__outer" id="mega-menu-outer"> <div class="mega-menu__inner" id="mega-menu-inner"> <div class="wrapper"></div> </div> </div> <button class="mega-menu__close js-mega-menu-close" data-test="mega-menu-close" type="button">Close <i class="fa fa-angle-double-up"></i></button> </div> </nav> <script type="module" src="/_astro/MainMenu.astro_astro_type_script_index_0_lang.DcvddH1p.js"></script> <script type="module">const i=()=>{const t=document.querySelector(".js-nav-site"),e=document.querySelector(".js-header-global");if(!t||!e){console.warn("Menu elements not found, sticky menu functionality disabled");return}const o=t.getBoundingClientRect().top+window.scrollY-document.documentElement.clientTop,s=()=>{e.classList.contains("is-menu-open")||(window.scrollY>o?e.classList.add("is-menu-scrolled"):e.classList.remove("is-menu-scrolled"))};s();let n=!1;document.addEventListener("scroll",function(){n||(n=!0,requestAnimationFrame(()=>{s(),n=!1}))},{passive:!0})};i();</script> </div> </header> <div aria-label="Promotional banner" aria-live="polite" class="notification notification--promo notification--hidden" data-notification data-notification-shell data-section="all_plant_profile" role="complementary" data-astro-cid-btbnizrn> <div class="notification__card" data-notification-card data-astro-cid-btbnizrn> <span aria-hidden="true" class="notification__icon notification__icon--promo" data-astro-cid-btbnizrn> <svg height="30" width="30" data-astro-cid-btbnizrn="true" viewBox="0 0 24 24" width="1.2em" height="1.2em"><path fill="currentColor" d="m8.85 16.825l3.15-1.9l3.15 1.925l-.825-3.6l2.775-2.4l-3.65-.325l-1.45-3.4l-1.45 3.375l-3.65.325l2.775 2.425zM5.825 21l1.625-7.025L2 9.25l7.2-.625L12 2l2.8 6.625l7.2.625l-5.45 4.725L18.175 21L12 17.275zM17.25 7l.525-2.225L16 3.3l2.35-.2l.9-2.1l.9 2.1l2.35.2l-1.775 1.475L21.25 7l-2-1.175zM12 11.975"></path></svg> </span> <span aria-hidden="true" class="notification__icon notification__icon--alert" data-astro-cid-btbnizrn> <svg height="30" width="30" data-astro-cid-btbnizrn="true" viewBox="0 0 24 24" width="1.2em" height="1.2em"><path fill="currentColor" d="M1 21L12 2l11 19zm11.713-3.287Q13 17.425 13 17t-.288-.712T12 16t-.712.288T11 17t.288.713T12 18t.713-.288M11 15h2v-5h-2z"></path></svg> </span> <div class="notification__content" data-astro-cid-btbnizrn> <p class="notification__title" data-slot="notification-title" data-astro-cid-btbnizrn></p> <p class="notification__description" data-slot="notification-subtitle" hidden data-astro-cid-btbnizrn></p> </div> <a class="btn btn--medium btn--with-icon btn--icon-right notification__link" href="#" data-ga data-astro-cid-btbnizrn="true" data-astro-cid-vnzlvqnm="true"><span class="btn__text" data-js="button-text" data-astro-cid-vnzlvqnm>
+Find out more
+</span> <span aria-hidden="true" class="btn__icon btn__icon--right" data-astro-cid-vnzlvqnm><svg width="16" height="16" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" class="svg-inline--fa fa-angle-right" role="img" viewBox="0 0 256 512"><path fill="currentColor" d="M247.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L179.2 256 41.9 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg></span></a>  <button aria-label="Close notification" class="notification__close" data-notification-close type="button" data-astro-cid-btbnizrn>  <span aria-hidden="true" class="notification__close-icon" data-astro-cid-btbnizrn><svg width="12" height="12" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="xmark" class="svg-inline--fa fa-xmark" role="img" viewBox="0 0 384 512"><path fill="currentColor" d="M55.1 73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L147.2 256 9.9 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192.5 301.3 329.9 438.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.8 256 375.1 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192.5 210.7 55.1 73.4z"></path></svg></span>  </button> </div> </div> <script type="module" src="/_astro/Notification.astro_astro_type_script_index_0_lang.D9W1B-t8.js"></script>   <div class="heading heading--plant-profile" data-astro-cid-nwmpm37n> <div class="heading__container" data-astro-cid-nwmpm37n> <div class="heading__grid" data-astro-cid-nwmpm37n> <div class="heading__content" data-astro-cid-nwmpm37n> <div class="heading__breadcrumb" data-astro-cid-nwmpm37n> <nav aria-label="Breadcrumb" class="breadcrumb breadcrumb--inverse" data-astro-cid-64kmezq4> <ol class="breadcrumb__list" data-astro-cid-64kmezq4> <li class="breadcrumb__item" data-astro-cid-64kmezq4> <a class="breadcrumb__link" data-link-name="breadcrumb|link-0|RHS Home|text" href="/" data-astro-cid-64kmezq4="true">
+RHS Home
+</a>  <span aria-hidden="true" class="breadcrumb__separator" data-astro-cid-64kmezq4><svg width="16" height="16" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" class="svg-inline--fa fa-angle-right" role="img" viewBox="0 0 256 512"><path fill="currentColor" d="M247.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L179.2 256 41.9 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg></span>  </li> <li class="breadcrumb__item" data-astro-cid-64kmezq4> <span aria-hidden="true" class="breadcrumb__separator breadcrumb__separator--back" data-astro-cid-64kmezq4><svg width="16" height="16" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-left" class="svg-inline--fa fa-angle-left" role="img" viewBox="0 0 256 512"><path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"></path></svg></span>  <a class="breadcrumb__link font-os-semibold" data-link-name="breadcrumb|link-1|Plants|text" href="/plants" data-astro-cid-64kmezq4="true">Plants</a>    </li> </ol> </nav>  </div> <div class="heading__inner-content" data-astro-cid-nwmpm37n> <div class="heading__title-wrapper" data-astro-cid-nwmpm37n> <h1 class="heading__title" data-kontent-element-codename="title" data-astro-cid-nwmpm37n>   <span data-astro-cid-nwmpm37n><i>Lavandula</i> <i>angustifolia</i> 'Compacta'</span> </h1>  <div class="heading__intro" data-astro-cid-nwmpm37n> <div class="heading-label heading-label--plant-profile" data-astro-cid-h4bphvrm> <span class="heading-label__container" data-astro-cid-h4bphvrm> <span class="heading-label__brand" data-astro-cid-h4bphvrm>RHS</span> Plant Profile </span> </div>  <div data-astro-cid-nwmpm37n> <span data-astro-cid-nwmpm37n>English lavender 'Compacta'</span>  </div> </div>   </div>  <div class="heading__save" data-astro-cid-nwmpm37n> <button class="my-plants-save" data-my-plants-save-trigger data-plant-id="9887" type="button" data-astro-cid-uzpvlpdh> <span aria-hidden="true" class="my-plants-save__icon" data-astro-cid-uzpvlpdh> <svg height="26" width="26" data-astro-cid-uzpvlpdh="true" width="24" height="27" viewBox="0 0 24 27" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M3.0019 1.10962C3.0019 1.10962 -5.71255 11.9818 6.55412 19.3346C6.30981 17.5931 6.43021 15.6272 6.92762 13.7805L7.52347 12.0498C8.10876 10.6801 8.93223 9.45281 10 8.53775C8.18347 3.24779 3.0019 1.10962 3.0019 1.10962Z" fill="#F5F2EE"></path> <path d="M23.9895 3.13464C9.48607 4.5993 7.86208 13.0555 8.00841 21.9154L17.7974 9.82357L9.54952 23.3846C18.5321 23.3127 24.2801 15.5175 23.9895 3.13464Z" fill="#F5F2EE"></path> </svg> </span> <span class="my-plants-save__label" data-astro-cid-uzpvlpdh>Save to My Plants</span> </button> <dialog class="modal modal--fill-height modal--narrow" id="save-to-my-plants" data-astro-cid-qmzm2soj style="--modalPatternCssVar: url('https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/e6d97d6e-d83d-4628-b612-b62023d24598/modal-pattern.png');"> <div class="modal__wrapper" data-astro-cid-qmzm2soj style="--modalPatternCssVar: url('https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/e6d97d6e-d83d-4628-b612-b62023d24598/modal-pattern.png');"> <div class="modal__header" data-astro-cid-qmzm2soj style="--modalPatternCssVar: url('https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/e6d97d6e-d83d-4628-b612-b62023d24598/modal-pattern.png');"> <form class="modal__close-form" method="dialog" data-astro-cid-qmzm2soj style="--modalPatternCssVar: url('https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/e6d97d6e-d83d-4628-b612-b62023d24598/modal-pattern.png');"> <button class="modal__close" data-astro-cid-qmzm2soj style="--modalPatternCssVar: url('https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/e6d97d6e-d83d-4628-b612-b62023d24598/modal-pattern.png');">  <span data-astro-cid-qmzm2soj style="--modalPatternCssVar: url('https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/e6d97d6e-d83d-4628-b612-b62023d24598/modal-pattern.png');"><svg width="24" height="24" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="xmark" class="svg-inline--fa fa-xmark" role="img" viewBox="0 0 384 512"><path fill="currentColor" d="M55.1 73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L147.2 256 9.9 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192.5 301.3 329.9 438.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.8 256 375.1 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192.5 210.7 55.1 73.4z"></path></svg></span> <span class="sr-only" data-astro-cid-qmzm2soj style="--modalPatternCssVar: url('https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/e6d97d6e-d83d-4628-b612-b62023d24598/modal-pattern.png');">Close modal</span> </button> </form> </div> <div class="modal__inner" data-astro-cid-qmzm2soj style="--modalPatternCssVar: url('https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/e6d97d6e-d83d-4628-b612-b62023d24598/modal-pattern.png');"> <div class="plant-save-modal" data-loading data-my-plants-save-modal data-astro-cid-uzpvlpdh> <div class="plant-save-header" data-astro-cid-uzpvlpdh> <h2 class="plant-save-header__title" data-astro-cid-uzpvlpdh>Save a plant</h2>  <p class="plant-save-header__description" data-astro-cid-uzpvlpdh>Where do you want to save <strong><i>Lavandula</i> <i>angustifolia</i> 'Compacta'</strong>?</p>  </div> <div aria-label="Loading your plant lists" class="spinner plant-save-modal__spinner" role="status" data-astro-cid-lolztsa2> <span aria-hidden="true" class="spinner__indicator spinner__indicator--medium" data-astro-cid-lolztsa2></span> </div>  <div class="plant-collections" data-my-plants-save-collections data-astro-cid-uzpvlpdh> <details class="plant-collections__panel plant-collections__panel--right" data-collection-type="PlantsIOwn" name="alpha" open data-astro-cid-uzpvlpdh> <summary class="plant-collections__tab" data-astro-cid-uzpvlpdh>Plants I own</summary> <div class="plant-collections__list plant-collections__list--owned" data-collection-list="myPlants" data-astro-cid-uzpvlpdh></div> </details> <details class="plant-collections__panel plant-collections__panel--left" data-collection-type="Wishlist" name="alpha" data-astro-cid-uzpvlpdh> <summary class="plant-collections__tab" data-astro-cid-uzpvlpdh>Wishlist</summary> <div class="plant-collections__list plant-collections__list--wishlist" data-collection-list="wishlist" data-astro-cid-uzpvlpdh></div> </details> </div> <div class="plant-new-list" data-astro-cid-uzpvlpdh> <button class="btn btn--primary btn--medium btn--with-icon btn--icon-right plant-new-list__button" type="button" data-my-plants-save-new-list-button="true" data-astro-cid-uzpvlpdh="true" data-astro-cid-vnzlvqnm="true"><span class="btn__text" data-js="button-text" data-astro-cid-vnzlvqnm>
+Add New List
+</span> <span aria-hidden="true" class="btn__icon btn__icon--right" data-astro-cid-vnzlvqnm><svg width="18" height="18" aria-hidden="true" focusable="false" data-prefix="far" data-icon="circle-plus" class="svg-inline--fa fa-circle-plus" role="img" viewBox="0 0 512 512"><path fill="currentColor" d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464a256 256 0 1 0 0-512 256 256 0 1 0 0 512zM232 344c0 13.3 10.7 24 24 24s24-10.7 24-24l0-64 64 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-64 0 0-64c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 64-64 0c-13.3 0-24 10.7-24 24s10.7 24 24 24l64 0 0 64z"></path></svg></span></button>  <form class="plant-new-list__form" data-my-plants-save-new-list-form hidden novalidate data-astro-cid-uzpvlpdh> <input class="form-input plant-new-list__input form-input--small" id="new-my-plants-list-name" name="new-my-plants-list-name" aria-label="New list name" autocomplete="off" data-my-plants-save-new-list-input="true" maxlength="100" placeholder="List name" type="text" data-astro-cid-uzpvlpdh="true" data-astro-cid-azdzk2aw>  <div class="plant-new-list__actions" data-astro-cid-uzpvlpdh> <button class="btn btn--outline btn--medium plant-new-list__cancel" type="button" data-my-plants-save-new-list-cancel="true" data-astro-cid-uzpvlpdh="true" data-astro-cid-vnzlvqnm="true"><span class="btn__text" data-js="button-text" data-astro-cid-vnzlvqnm>
+Cancel
+</span> </button>  <button class="btn btn--primary btn--medium plant-new-list__save" type="submit" data-my-plants-save-new-list-save="true" data-astro-cid-uzpvlpdh="true" data-astro-cid-vnzlvqnm="true"><span class="btn__text" data-js="button-text" data-astro-cid-vnzlvqnm>
+Save
+</span> </button>  </div> </form> </div> <a class="plant-new-list__link" data-link-name="myPlantsSave|cta|Go to My Plants|text" href="/my-account/my-plants" data-astro-cid-uzpvlpdh="true">
+Go to My Plants
+</a> <template id="my-plants-checkbox-template" data-astro-cid-uzpvlpdh> <label aria-label="Collection name" class="form-checkbox plant-collection-item cursor-pointer" data-checkbox-row data-astro-cid-uzpvlpdh> <span aria-hidden="true" class="plant-collection-item__avatar" data-checkbox-avatar data-astro-cid-uzpvlpdh> <img alt="" class="plant-collection-item__image" data-checkbox-image hidden data-astro-cid-uzpvlpdh> <span class="plant-collection-item__initials" data-checkbox-avatar-fallback data-astro-cid-uzpvlpdh>
+CN
+</span> </span> <span class="plant-collection-item__copy" data-astro-cid-uzpvlpdh> <span class="form-checkbox__label" data-checkbox-label data-astro-cid-uzpvlpdh>Collection name</span> </span> <input class="form-checkbox__input" data-checkbox-input type="checkbox" data-astro-cid-uzpvlpdh> <span aria-hidden="true" class="form-checkbox__indicator" data-astro-cid-uzpvlpdh></span> </label> </template> </div> </div>  <div class="modal__footer" data-astro-cid-qmzm2soj style="--modalPatternCssVar: url('https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/e6d97d6e-d83d-4628-b612-b62023d24598/modal-pattern.png');">  </div> </div> </dialog> <script>(function(){const safeId = "save-to-my-plants";
+const triggerId = "";
+
+  const dialog = document.getElementById(safeId);
+  const trigger = triggerId ? document.getElementById(triggerId) : null;
+
+  const lockModalScroll = () => {
+    document.documentElement.classList.add('modal-open');
+    document.body.classList.add('modal-open');
+  };
+
+  const unlockModalScroll = () => {
+    if (document.querySelector('dialog[open]')) return;
+
+    document.documentElement.classList.remove('modal-open');
+    document.body.classList.remove('modal-open');
+  };
+
+  const scheduleInitialFocus = () => {
+    // Wait for the next paint frame...
+    requestAnimationFrame(() => {
+      // ...then wait one more frame to ensure the dialog is fully rendered and focusable
+      requestAnimationFrame(focusInitialElement);
+    });
+  };
+
+  const focusInitialElement = () => {
+    // Ensure we are working with a real <dialog> element
+    if (!(dialog instanceof HTMLDialogElement)) return;
+
+    // Try to find an element explicitly marked as the initial focus target
+    const initialFocus = dialog.querySelector('[data-autofocus="true"]');
+
+    if (initialFocus instanceof HTMLElement) {
+      // Attempt to focus it without scrolling the page
+      initialFocus.focus({ preventScroll: true });
+
+      // If focus succeeded, stop here
+      // (prevents fallback from overriding intended focus)
+      if (document.activeElement === initialFocus) {
+        return;
+      }
+    }
+  };
+
+  if (
+    dialog instanceof HTMLDialogElement &&
+    trigger instanceof HTMLButtonElement
+  ) {
+    trigger.addEventListener('click', () => {
+      // Open the modal dialog
+      dialog.showModal();
+      lockModalScroll();
+
+      // After rendering settles, move focus inside modal
+      scheduleInitialFocus();
+    });
+  }
+
+  if (dialog instanceof HTMLDialogElement) {
+    // Keep focus handling for any open state changes, including programmatic ones.
+    const openObserver = new MutationObserver(() => {
+      if (dialog.open) {
+        lockModalScroll();
+
+        // Ensure focus is set even if opened programmatically
+        scheduleInitialFocus();
+      }
+    });
+
+    openObserver.observe(dialog, {
+      attributeFilter: ['open'],
+      attributes: true,
+    });
+
+    // Clicking on the backdrop (outside dialog content) closes the modal
+    dialog.addEventListener('click', (event) => {
+      // Ignore clicks inside the dialog content
+      if (event.target !== dialog) return;
+
+      const rect = dialog.getBoundingClientRect();
+
+      // Extra safety check: ensure click was truly outside content bounds
+      const clickedInsideDialog =
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom;
+
+      if (!clickedInsideDialog) {
+        dialog.close();
+      }
+    });
+
+    // When modal closes, return focus to the element that opened it
+    dialog.addEventListener('close', () => {
+      unlockModalScroll();
+
+      if (trigger instanceof HTMLElement) {
+        trigger.focus({ preventScroll: true });
+      }
+    });
+  }
+})();</script>   <script data-config="{&#34;authorityBase&#34;:&#34;https://rhslogin.b2clogin.com/rhslogin.onmicrosoft.com/&#34;,&#34;clientId&#34;:&#34;513b1feb-9a64-4665-bc12-f8e7029f9498&#34;,&#34;defaultRedirectUri&#34;:&#34;https://www.rhs.org.uk/auth/callback&#34;,&#34;enabled&#34;:true,&#34;knownAuthority&#34;:&#34;rhslogin.b2clogin.com&#34;,&#34;logoutRedirectUri&#34;:&#34;https://www.rhs.org.uk/&#34;,&#34;scopes&#34;:[&#34;https://rhslogin.onmicrosoft.com/api/user.profile&#34;],&#34;signInPolicy&#34;:&#34;B2C_1A_SIGNUP_OR_SIGNIN_CARE&#34;}" id="rhs-b2c-config" type="application/json"></script> <script type="module" src="/_astro/MyPlantsSave.astro_astro_type_script_index_0_lang.D-hrfY8-.js"></script> </div> </div> </div> </div> </div> <div class="heading__margin" data-astro-cid-nwmpm37n></div> </div> <div class="plant-profile" data-astro-cid-2xyokxkh> <div class="plant-profile__alert" data-astro-cid-2xyokxkh>  </div> <div class="plant-profile__layout" data-astro-cid-2xyokxkh> <!-- Main content --> <main class="plant-profile__main" data-astro-cid-2xyokxkh> <div class="plant-profile__top" data-astro-cid-2xyokxkh>  <div class="plant-profile__names" data-astro-cid-2xyokxkh>  <div class="plant-profile__synonyms" data-astro-cid-2xyokxkh> <h2 class="plant-profile__synonyms-heading" data-astro-cid-2xyokxkh>Synonyms</h2>  <p class="plant-profile__synonyms-text" data-astro-cid-2xyokxkh><i>Lavandula</i> <i>angustifolia</i> 'Nana Compacta'</p>  </div> <div class="plant-profile__badges" data-astro-cid-2xyokxkh>  </div> </div> </div>    <p data-astro-cid-2xyokxkh></p>  </main> <!-- Sidebar --> <aside class="plant-profile__sidebar" data-astro-cid-2xyokxkh> <div data-promo="article-inline-2" data-astro-cid-2xyokxkh> <div class="plant-promo" data-astro-cid-x3g6ct4r> <div class="plant-promo__image" data-astro-cid-x3g6ct4r> <img alt="RHS plant" class="plant-promo__img" decoding="async" loading="lazy" sizes="(min-width: 1024px) 25vw, (min-width: 744px) 33vw, (min-width: 640px) 50vw, (min-width: 480px) 50vw, 100vw" src="https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/d051bbd1-607c-41f9-9b6a-7518685378d3/plant-promo.jpg" srcset="https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/d051bbd1-607c-41f9-9b6a-7518685378d3/plant-promo.jpg?w=480&fit=clip&fm=jpg&auto=format 480w, https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/d051bbd1-607c-41f9-9b6a-7518685378d3/plant-promo.jpg?w=768&fit=clip&fm=jpg&auto=format 768w, https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/d051bbd1-607c-41f9-9b6a-7518685378d3/plant-promo.jpg?w=1280&fit=clip&fm=jpg&auto=format 1280w" data-astro-cid-x3g6ct4r> </div> <div class="plant-promo__content" data-astro-cid-x3g6ct4r> <h2 class="plant-promo__title" data-astro-cid-x3g6ct4r>Buy plants from RHS Plants and support the work of the RHS</h2> <div class="plant-promo__cta" data-astro-cid-x3g6ct4r> <a class="btn btn--secondary-alt btn--medium btn--with-icon btn--icon-right" href="https://www.rhsplants.co.uk/" target="_blank" rel="noopener noreferrer" data-ga data-link-name="promotion_plant-9887|primary|Buy plants from RHS|button" data-astro-cid-x3g6ct4r="true" data-astro-cid-vnzlvqnm="true"><span class="btn__text" data-js="button-text" data-astro-cid-vnzlvqnm>
+Buy Now
+</span> <span aria-hidden="true" class="btn__icon btn__icon--right" data-astro-cid-vnzlvqnm><svg width="16" height="16" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" class="svg-inline--fa fa-angle-right" role="img" viewBox="0 0 256 512"><path fill="currentColor" d="M247.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L179.2 256 41.9 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg></span></a>  </div> </div> </div>  </div> <div class="hidden lg:block mb-8" data-promo="article-end" data-astro-cid-2xyokxkh> <aside aria-label="Advertisement" data-ad-div-id="ad-mpu-plant-profile-desktop" data-ad-size-mapping="[[[640,0],[[300,250],[320,100],[320,50]]],[[0,0],[[320,100],[320,50]]]]" data-ad-sizes="[[300,250],[320,100],[320,50]]" data-ad-slot="true" data-ad-slot-path="/21682926971/MPU"><div id="ad-mpu-plant-profile-desktop"></div><div data-ad-fallback hidden><div class="promo-card" data-astro-cid-aqdgeugs> <div class="promo-card__bg" style="background-image: url(https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/dd37f6e0-006c-480e-844e-52ee87bc910a/bg-magnolia.png?w=530&#38;auto=format);" data-astro-cid-aqdgeugs></div> <div class="promo-card__content" data-astro-cid-aqdgeugs> <header class="promo-card__header" data-astro-cid-aqdgeugs> <img alt="Grow" class="promo-card__media" decoding="async" height="190" loading="lazy" sizes="120px" src="https://assets.rhs.org.uk/05836e9f-2692-012f-b4fe-e3f22d127fa9/39859389-8ffc-431b-8a83-47b311e75bfa/grow-app-phone.png?w=120&auto=format" srcset="https://assets.rhs.org.uk/05836e9f-2692-012f-b4fe-e3f22d127fa9/39859389-8ffc-431b-8a83-47b311e75bfa/grow-app-phone.png?w=120&auto=format 120w, https://assets.rhs.org.uk/05836e9f-2692-012f-b4fe-e3f22d127fa9/39859389-8ffc-431b-8a83-47b311e75bfa/grow-app-phone.png?w=240&auto=format 240w" width="120" data-astro-cid-aqdgeugs> <div class="promo-card__branding" data-astro-cid-aqdgeugs> <img alt="RHS Logo" class="promo-card__logo" src="/ui-assets/rhs-logo.svg" data-astro-cid-aqdgeugs> <h2 class="promo-card__title" data-astro-cid-aqdgeugs> <a class="promo-card__link" data-link-name="promotion_eb04ed09-922a-4236-be22-e5d22dbb46e9|primary|Grow|image-and-text" href="https://rhsgrow.onelink.me/430N/advbnrstatjun26" data-astro-cid-aqdgeugs="true" target="_blank" rel="noopener noreferrer">Grow </a> </h2> </div> </header> <div class="promo-card__body" data-astro-cid-aqdgeugs>  <p class="promo-card__subtitle" data-astro-cid-aqdgeugs>The new app packed with trusted gardening know-how</p>  <a class="btn btn--secondary-alt btn--medium btn--with-icon btn--icon-right promo-card__cta" href="https://rhsgrow.onelink.me/430N/advbnrstatjun26" target="_blank" rel="noopener noreferrer" data-ga data-link-name="link|link" data-astro-cid-aqdgeugs="true" data-astro-cid-vnzlvqnm="true"><span class="btn__text" data-js="button-text" data-astro-cid-vnzlvqnm>Download app</span> <span aria-hidden="true" class="btn__icon btn__icon--right" data-astro-cid-vnzlvqnm><svg width="16" height="16" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" class="svg-inline--fa fa-angle-right" role="img" viewBox="0 0 256 512"><path fill="currentColor" d="M247.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L179.2 256 41.9 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg></span></a>  </div> </div> </div> </div></aside> </div> </aside> <div class="plant-profile__info" data-astro-cid-2xyokxkh> <div class="plant-profile__section" data-astro-cid-2xyokxkh> <div class="section-header" data-astro-cid-ujokb5jv> <div class="section-header__icon text-primary-dark-blue" data-astro-cid-ujokb5jv> <svg aria-hidden="true" height="24" width="24" data-astro-cid-ujokb5jv="true" xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 23 23" fill="none"> <path d="M20.7147 3.8636H22.3998V1.68476C22.3996 1.2379 22.2221 0.809255 21.9061 0.493314C21.5901 0.177373 21.1615 0 20.7147 0C20.2678 0 19.8394 0.177354 19.5232 0.493314L0.49331 19.5234C0.177348 19.8396 0 20.268 0 20.7149C0 21.1617 0.177353 21.5904 0.49331 21.9063C0.809267 22.2222 1.2379 22.3998 1.68474 22.4H3.86357V20.7149C3.86357 20.4138 4.02418 20.1356 4.28485 19.9851C4.54552 19.8347 4.86675 19.8347 5.12742 19.9851C5.38808 20.1356 5.5487 20.4138 5.5487 20.7149V22.4H8.07639V20.7149C8.07639 20.4138 8.23701 20.1356 8.49768 19.9851C8.75835 19.8347 9.07958 19.8347 9.34024 19.9851C9.60091 20.1356 9.76152 20.4138 9.76152 20.7149V22.4H12.2892V20.7149C12.2892 20.4138 12.4498 20.1356 12.7105 19.9851C12.9712 19.8347 13.2924 19.8347 13.5531 19.9851C13.8137 20.1356 13.9743 20.4138 13.9743 20.7149V22.4H16.502V20.7149C16.502 20.4138 16.6627 20.1356 16.9233 19.9851C17.184 19.8347 17.5052 19.8347 17.7659 19.9851C18.0266 20.1356 18.1872 20.4138 18.1872 20.7149V22.4H19.8723C20.5428 22.4 21.1856 22.1337 21.6597 21.6597C22.1337 21.1856 22.4 20.5428 22.4 19.8723V18.1871H20.7149C20.4138 18.1871 20.1356 18.0265 19.9852 17.7659C19.8347 17.5052 19.8347 17.184 19.9852 16.9233C20.1356 16.6626 20.4138 16.502 20.7149 16.502H22.4V13.9743H20.7149C20.4138 13.9743 20.1356 13.8137 19.9852 13.553C19.8347 13.2923 19.8347 12.9711 19.9852 12.7104C20.1356 12.4498 20.4138 12.2891 20.7149 12.2891H22.4V9.76142H20.7149C20.4138 9.76142 20.1356 9.6008 19.9852 9.34013C19.8347 9.07946 19.8347 8.75823 19.9852 8.49756C20.1356 8.23689 20.4138 8.07627 20.7149 8.07627H22.4V5.54856H20.7149C20.4138 5.54856 20.1356 5.38794 19.9852 5.12727C19.8347 4.8666 19.8347 4.54536 19.9852 4.2847C20.1356 4.02403 20.4138 3.86341 20.7149 3.86341L20.7147 3.8636ZM17.3444 16.5022C17.3444 16.7256 17.2556 16.94 17.0977 17.098C16.9397 17.256 16.7253 17.3448 16.5019 17.3448H10.6039C10.3805 17.3448 10.1663 17.256 10.0083 17.098C9.8503 16.9398 9.76152 16.7256 9.76152 16.5022C9.76152 16.2788 9.8503 16.0645 10.0083 15.9066L15.9062 10.0086C16.0642 9.85058 16.2784 9.7618 16.5019 9.7618C16.7253 9.7618 16.9395 9.85058 17.0977 10.0086C17.2556 10.1665 17.3444 10.3808 17.3444 10.6042V16.5022Z" fill="currentColor"></path> </svg> </div> <div class="section-header__heading" data-astro-cid-ujokb5jv> <h2 class="section-header__heading-title" data-astro-cid-ujokb5jv>Size</h2>  </div> </div>  <div class="size p-4 pt-2" data-astro-cid-2xyokxkh> <dl data-astro-cid-2xyokxkh> <div data-astro-cid-2xyokxkh> <dt data-astro-cid-2xyokxkh> <span class="size__icon" data-astro-cid-2xyokxkh> <svg aria-hidden="true" height="30" width="30" data-astro-cid-2xyokxkh="true" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" fill="none"> <rect width="30" height="30" rx="15" fill="#3B3630" fill-opacity="0.1"></rect> <path d="M19.3902 24.5065L20 24.5065L19.9999 25.75L10 25.75L10 24.5065L10.6094 24.5065C10.6094 19.1503 14.3491 18.7732 14.3491 16.9999C14.3491 15.2271 10.6094 14.85 10.6094 9.49361L10 9.49361L10 8.25L19.9999 8.25L19.9999 9.49361L19.39 9.49361C19.39 14.8499 15.6507 15.227 15.6507 16.9999C15.651 18.773 19.3904 19.1503 19.3904 24.5065L19.3902 24.5065ZM15.7021 15.3627C16.8092 14.1901 18.3974 13.3745 18.6378 10.1898L11.3573 10.1898C11.5044 12.2456 12.2455 13.2965 13.013 14.1225C13.4436 14.5778 13.8978 14.9462 14.2972 15.3628C14.5857 15.6629 14.8704 16.0315 14.9998 16.4862C15.1286 16.0317 15.4133 15.6627 15.7021 15.3627ZM15.5289 18.234C15.3114 18.008 15.0968 17.7303 14.9997 17.3877C14.9023 17.7304 14.6878 18.0079 14.4703 18.234C13.9022 18.8359 13.1666 19.3148 12.6973 20.3159L17.3015 20.316C17.0745 19.8409 16.7884 19.4836 16.4968 19.1697C16.1725 18.8264 15.8299 18.5483 15.529 18.234L15.5289 18.234Z" fill="#3B3630"></path> </svg> </span> 
+Time to Maturity
+</dt> <dd data-astro-cid-2xyokxkh> No preference </dd> </div>   </dl> </div> </div>    <div class="plant-profile__section" data-astro-cid-2xyokxkh> <div class="section-header" data-astro-cid-ujokb5jv> <div class="section-header__icon text-primary-dark-blue" data-astro-cid-ujokb5jv> <svg aria-hidden="true" height="24" width="24" data-astro-cid-ujokb5jv="true" xmlns="http://www.w3.org/2000/svg" width="22" height="15" viewBox="0 0 22 15" fill="none"> <path fill-rule="evenodd" clip-rule="evenodd" d="M0 2.09038C3.87135 2.58459 6.26016 -2.19289 10.2961 1.26673V13.5397C6.26006 10.0803 3.8714 14.7753 0 14.2811V2.09038ZM21.3333 2.09038C17.462 2.58459 15.0732 -2.19289 11.0372 1.26673V13.5397C15.0733 10.0803 17.4619 14.7753 21.3333 14.2811V2.09038Z" fill="currentColor"></path> </svg> </div> <div class="section-header__heading" data-astro-cid-ujokb5jv> <h2 class="section-header__heading-title" data-astro-cid-ujokb5jv>Botanical Details</h2>  </div> </div>  <div class="botanical-details" data-astro-cid-63wim65b> <dl data-astro-cid-63wim65b> <div data-astro-cid-63wim65b> <dt data-astro-cid-63wim65b>Family</dt> <dd data-astro-cid-63wim65b>Lamiaceae</dd> </div> <div data-astro-cid-63wim65b> <dt data-astro-cid-63wim65b>Native to GB/Ireland</dt> <dd data-astro-cid-63wim65b>No</dd> </div>    <div data-astro-cid-63wim65b> <dt data-astro-cid-63wim65b>Genus</dt>  <dd data-astro-cid-63wim65b>Lavandula are small aromatic evergreen shrubs with usually narrow, simple, entire, toothed or lobed leaves and small tubular flowers in dense spikes in summer</dd>  </div> <div data-astro-cid-63wim65b> <dt data-astro-cid-63wim65b>Name Status</dt> <dd data-astro-cid-63wim65b>Accepted</dd> </div>   </dl> </div>  </div>  <div class="lg:hidden mb-8 ml-4" data-promo="article-end" data-astro-cid-2xyokxkh> <aside aria-label="Advertisement" data-ad-div-id="ad-mpu-plant-profile-mobile" data-ad-size-mapping="[[[640,0],[[300,250],[320,100],[320,50]]],[[0,0],[[320,100],[320,50]]]]" data-ad-sizes="[[300,250],[320,100],[320,50]]" data-ad-slot="true" data-ad-slot-path="/21682926971/MPU"><div id="ad-mpu-plant-profile-mobile"></div><div data-ad-fallback hidden><div class="promo-card" data-astro-cid-aqdgeugs> <div class="promo-card__bg" style="background-image: url(https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/dd37f6e0-006c-480e-844e-52ee87bc910a/bg-magnolia.png?w=530&#38;auto=format);" data-astro-cid-aqdgeugs></div> <div class="promo-card__content" data-astro-cid-aqdgeugs> <header class="promo-card__header" data-astro-cid-aqdgeugs> <img alt="Grow" class="promo-card__media" decoding="async" height="190" loading="lazy" sizes="120px" src="https://assets.rhs.org.uk/05836e9f-2692-012f-b4fe-e3f22d127fa9/39859389-8ffc-431b-8a83-47b311e75bfa/grow-app-phone.png?w=120&auto=format" srcset="https://assets.rhs.org.uk/05836e9f-2692-012f-b4fe-e3f22d127fa9/39859389-8ffc-431b-8a83-47b311e75bfa/grow-app-phone.png?w=120&auto=format 120w, https://assets.rhs.org.uk/05836e9f-2692-012f-b4fe-e3f22d127fa9/39859389-8ffc-431b-8a83-47b311e75bfa/grow-app-phone.png?w=240&auto=format 240w" width="120" data-astro-cid-aqdgeugs> <div class="promo-card__branding" data-astro-cid-aqdgeugs> <img alt="RHS Logo" class="promo-card__logo" src="/ui-assets/rhs-logo.svg" data-astro-cid-aqdgeugs> <h2 class="promo-card__title" data-astro-cid-aqdgeugs> <a class="promo-card__link" data-link-name="promotion_eb04ed09-922a-4236-be22-e5d22dbb46e9|primary|Grow|image-and-text" href="https://rhsgrow.onelink.me/430N/advbnrstatjun26" data-astro-cid-aqdgeugs="true" target="_blank" rel="noopener noreferrer">Grow </a> </h2> </div> </header> <div class="promo-card__body" data-astro-cid-aqdgeugs>  <p class="promo-card__subtitle" data-astro-cid-aqdgeugs>The new app packed with trusted gardening know-how</p>  <a class="btn btn--secondary-alt btn--medium btn--with-icon btn--icon-right promo-card__cta" href="https://rhsgrow.onelink.me/430N/advbnrstatjun26" target="_blank" rel="noopener noreferrer" data-ga data-link-name="link|link" data-astro-cid-aqdgeugs="true" data-astro-cid-vnzlvqnm="true"><span class="btn__text" data-js="button-text" data-astro-cid-vnzlvqnm>Download app</span> <span aria-hidden="true" class="btn__icon btn__icon--right" data-astro-cid-vnzlvqnm><svg width="16" height="16" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" class="svg-inline--fa fa-angle-right" role="img" viewBox="0 0 256 512"><path fill="currentColor" d="M247.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L179.2 256 41.9 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg></span></a>  </div> </div> </div> </div></aside> </div> </div> </div> </div> <script type="module">const s=()=>{document.querySelectorAll(".images-modal__frame").forEach(e=>{const t=e.querySelector(".images-modal__img");if(!(e instanceof HTMLElement)||!(t instanceof HTMLImageElement))return;const n=e.clientWidth,a=e.clientHeight,i=t.naturalWidth,r=t.naturalHeight;if(!n||!a||!i||!r){e.style.setProperty("--images-modal-image-inset-x","0px"),e.style.setProperty("--images-modal-image-inset-y","0px");return}const l=n/a,o=i/r,c=o>l?n:a*o,g=o>l?n/o:a;e.style.setProperty("--images-modal-image-inset-x",`${Math.max((n-c)/2,0)}px`),e.style.setProperty("--images-modal-image-inset-y",`${Math.max((a-g)/2,0)}px`)})},d=()=>{if(document.querySelectorAll(".images-modal__img").forEach(e=>{e instanceof HTMLImageElement&&(e.complete?s():e.addEventListener("load",s,{once:!0}))}),s(),typeof ResizeObserver<"u"){const e=new ResizeObserver(()=>{s()});document.querySelectorAll(".images-modal__frame").forEach(t=>{t instanceof HTMLElement&&e.observe(t)})}else globalThis.addEventListener("resize",s)};document.readyState==="loading"?document.addEventListener("DOMContentLoaded",d,{once:!0}):d();</script>  <footer class="footer" data-test="footer" data-astro-cid-sz7xmlte> <div class="footer__top" data-astro-cid-sz7xmlte> <img alt="" class="footer__bg" height="260" loading="lazy" sizes="100vw" src="https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/1ecee3b4-cd3d-4cb1-9dd7-35a9cbb7961d/footer_bg.webp?w=1920&fit=crop&fm=webp&auto=format" srcset="https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/1ecee3b4-cd3d-4cb1-9dd7-35a9cbb7961d/footer_bg.webp?w=480&fit=crop&fm=webp&auto=format 480w, https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/1ecee3b4-cd3d-4cb1-9dd7-35a9cbb7961d/footer_bg.webp?w=960&fit=crop&fm=webp&auto=format 960w, https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/1ecee3b4-cd3d-4cb1-9dd7-35a9cbb7961d/footer_bg.webp?w=1920&fit=crop&fm=webp&auto=format 1920w" width="1920" data-astro-cid-sz7xmlte> <div class="footer__cta-panel" data-astro-cid-sz7xmlte> <div class="footer__top-col footer__top-col--bottom" data-astro-cid-sz7xmlte> <h3 class="footer__top-heading" data-astro-cid-sz7xmlte>Join the RHS</h3> </div>  <a class="footer__top-col footer__top-col--bottom" data-link-name="footer|subtitle|Become an RHS Member|text" href="/join" data-astro-cid-sz7xmlte="true">Become an RHS Member today <strong>and save 30% on your first year</strong></a>  <div class="footer__top-col" data-astro-cid-sz7xmlte> <a class="btn btn--medium btn--with-icon btn--icon-right footer__cta" href="/join" data-ga data-link-name="footer|cta|Join now|button" data-astro-cid-sz7xmlte="true" data-astro-cid-vnzlvqnm="true"><span class="btn__text" data-js="button-text" data-astro-cid-vnzlvqnm>Join now</span> <span aria-hidden="true" class="btn__icon btn__icon--right" data-astro-cid-vnzlvqnm><svg width="16" height="16" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" class="svg-inline--fa fa-angle-right" role="img" viewBox="0 0 256 512"><path fill="currentColor" d="M247.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L179.2 256 41.9 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg></span></a>  </div> </div> </div> <div class="footer__social" data-astro-cid-sz7xmlte> <div class="footer-social-wrapper" data-astro-cid-co46enbq>  <ul class="footer-social" data-astro-cid-co46enbq>  <li data-astro-cid-co46enbq> <a class="footer-social__item" data-link-name="social|link-1|Instagram|image" aria-label="Follow the RHS on Instagram" href="https://www.instagram.com/The_RHS/" rel="noopener noreferrer" target="_blank" data-astro-cid-co46enbq="true"><svg width="26" height="26" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="instagram" class="svg-inline--fa fa-instagram" role="img" viewBox="0 0 448 512"><path fill="currentColor" d="M224.3 141a115 115 0 1 0 -.6 230 115 115 0 1 0 .6-230zm-.6 40.4a74.6 74.6 0 1 1 .6 149.2 74.6 74.6 0 1 1 -.6-149.2zm93.4-45.1a26.8 26.8 0 1 1 53.6 0 26.8 26.8 0 1 1 -53.6 0zm129.7 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM399 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"></path></svg></a> </li><li data-astro-cid-co46enbq> <a class="footer-social__item" data-link-name="social|link-2|YouTube|image" aria-label="Follow the RHS on YouTube" href="https://www.youtube.com/@The_RHS" rel="noopener noreferrer" target="_blank" data-astro-cid-co46enbq="true"><svg width="26" height="26" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="youtube" class="svg-inline--fa fa-youtube" role="img" viewBox="0 0 576 512"><path fill="currentColor" d="M549.7 124.1C543.5 100.4 524.9 81.8 501.4 75.5 458.9 64 288.1 64 288.1 64S117.3 64 74.7 75.5C51.2 81.8 32.7 100.4 26.4 124.1 15 167 15 256.4 15 256.4s0 89.4 11.4 132.3c6.3 23.6 24.8 41.5 48.3 47.8 42.6 11.5 213.4 11.5 213.4 11.5s170.8 0 213.4-11.5c23.5-6.3 42-24.2 48.3-47.8 11.4-42.9 11.4-132.3 11.4-132.3s0-89.4-11.4-132.3zM232.2 337.6l0-162.4 142.7 81.2-142.7 81.2z"></path></svg></a> </li><li data-astro-cid-co46enbq> <a class="footer-social__item" data-link-name="social|link-3|TikTok|image" aria-label="Follow the RHS on TikTok" href="https://www.tiktok.com/@the_rhs" rel="noopener noreferrer" target="_blank" data-astro-cid-co46enbq="true"><svg width="26" height="26" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="tiktok" class="svg-inline--fa fa-tiktok" role="img" viewBox="0 0 448 512"><path fill="currentColor" d="M448.5 209.9c-44 .1-87-13.6-122.8-39.2l0 178.7c0 33.1-10.1 65.4-29 92.6s-45.6 48-76.6 59.6-64.8 13.5-96.9 5.3-60.9-25.9-82.7-50.8-35.3-56-39-88.9 2.9-66.1 18.6-95.2 40-52.7 69.6-67.7 62.9-20.5 95.7-16l0 89.9c-15-4.7-31.1-4.6-46 .4s-27.9 14.6-37 27.3-14 28.1-13.9 43.9 5.2 31 14.5 43.7 22.4 22.1 37.4 26.9 31.1 4.8 46-.1 28-14.4 37.2-27.1 14.2-28.1 14.2-43.8l0-349.4 88 0c-.1 7.4 .6 14.9 1.9 22.2 3.1 16.3 9.4 31.9 18.7 45.7s21.3 25.6 35.2 34.6c19.9 13.1 43.2 20.1 67 20.1l0 87.4z"></path></svg></a> </li><li data-astro-cid-co46enbq> <a class="footer-social__item" data-link-name="social|link-4|Threads|image" aria-label="Follow the RHS on Threads" href="https://www.threads.com/@the_rhs" rel="noopener noreferrer" target="_blank" data-astro-cid-co46enbq="true"><svg width="26" height="26" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="threads" class="svg-inline--fa fa-threads" role="img" viewBox="0 0 448 512"><path fill="currentColor" d="M331.5 235.7c2.2 .9 4.2 1.9 6.3 2.8 29.2 14.1 50.6 35.2 61.8 61.4 15.7 36.5 17.2 95.8-30.3 143.2-36.2 36.2-80.3 52.5-142.6 53l-.3 0c-70.2-.5-124.1-24.1-160.4-70.2-32.3-41-48.9-98.1-49.5-169.6l0-.5C17 184.3 33.6 127.2 65.9 86.2 102.2 40.1 156.2 16.5 226.4 16l.3 0c70.3 .5 124.9 24 162.3 69.9 18.4 22.7 32 50 40.6 81.7l-40.4 10.8c-7.1-25.8-17.8-47.8-32.2-65.4-29.2-35.8-73-54.2-130.5-54.6-57 .5-100.1 18.8-128.2 54.4-26.2 33.3-39.8 81.5-40.3 143.2 .5 61.7 14.1 109.9 40.3 143.3 28 35.6 71.2 53.9 128.2 54.4 51.4-.4 85.4-12.6 113.7-40.9 32.3-32.2 31.7-71.8 21.4-95.9-6.1-14.2-17.1-26-31.9-34.9-3.7 26.9-11.8 48.3-24.7 64.8-17.1 21.8-41.4 33.6-72.7 35.3-23.6 1.3-46.3-4.4-63.9-16-20.8-13.8-33-34.8-34.3-59.3-2.5-48.3 35.7-83 95.2-86.4 21.1-1.2 40.9-.3 59.2 2.8-2.4-14.8-7.3-26.6-14.6-35.2-10-11.7-25.6-17.7-46.2-17.8l-.7 0c-16.6 0-39 4.6-53.3 26.3l-34.4-23.6c19.2-29.1 50.3-45.1 87.8-45.1l.8 0c62.6 .4 99.9 39.5 103.7 107.7l-.2 .2 .1 0zm-156 68.8c1.3 25.1 28.4 36.8 54.6 35.3 25.6-1.4 54.6-11.4 59.5-73.2-13.2-2.9-27.8-4.4-43.4-4.4-4.8 0-9.6 .1-14.4 .4-42.9 2.4-57.2 23.2-56.2 41.8l-.1 .1z"></path></svg></a> </li><li data-astro-cid-co46enbq> <a class="footer-social__item" data-link-name="social|link-5|Facebook|image" aria-label="Follow the RHS on Facebook" href="https://www.facebook.com/rhshome" rel="noopener noreferrer" target="_blank" data-astro-cid-co46enbq="true"><svg width="26" height="26" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="facebook-f" class="svg-inline--fa fa-facebook-f" role="img" viewBox="0 0 320 512"><path fill="currentColor" d="M80 299.3l0 212.7 116 0 0-212.7 86.5 0 18-97.8-104.5 0 0-34.6c0-51.7 20.3-71.5 72.7-71.5 16.3 0 29.4 .4 37 1.2l0-88.7C291.4 4 256.4 0 236.2 0 129.3 0 80 50.5 80 159.4l0 42.1-66 0 0 97.8 66 0z"></path></svg></a> </li><li data-astro-cid-co46enbq> <a class="footer-social__item" data-link-name="social|link-6|Pinterest|image" aria-label="Follow the RHS on Pinterest" href="https://www.pinterest.co.uk/rhshome/" rel="noopener noreferrer" target="_blank" data-astro-cid-co46enbq="true"><svg width="26" height="26" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="pinterest-p" class="svg-inline--fa fa-pinterest-p" role="img" viewBox="0 0 384 512"><path fill="currentColor" d="M204 6.5c-102.6 0-204 68.4-204 179.1 0 70.4 39.6 110.4 63.6 110.4 9.9 0 15.6-27.6 15.6-35.4 0-9.3-23.7-29.1-23.7-67.8 0-80.4 61.2-137.4 140.4-137.4 68.1 0 118.5 38.7 118.5 109.8 0 53.1-21.3 152.7-90.3 152.7-24.9 0-46.2-18-46.2-43.8 0-37.8 26.4-74.4 26.4-113.4 0-66.2-93.9-54.2-93.9 25.8 0 16.8 2.1 35.4 9.6 50.7-13.8 59.4-42 147.9-42 209.1 0 18.9 2.7 37.5 4.5 56.4 3.4 3.8 1.7 3.4 6.9 1.5 50.4-69 48.6-82.5 71.4-172.8 12.3 23.4 44.1 36 69.3 36 106.2 0 153.9-103.5 153.9-196.8 0-99.3-85.8-164.1-180-164.1z"></path></svg></a> </li>  </ul> </div>  </div> <div class="footer__nav" data-astro-cid-sz7xmlte> <img alt="" class="footer__nav-bg" height="260" loading="lazy" sizes="100vw" src="https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/39cc1261-0d6c-4c24-9f2c-e47371dab616/footer_bg_pattern.webp?w=1920&fit=crop&fm=webp&auto=format" srcset="https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/39cc1261-0d6c-4c24-9f2c-e47371dab616/footer_bg_pattern.webp?w=480&fit=crop&fm=webp&auto=format 480w, https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/39cc1261-0d6c-4c24-9f2c-e47371dab616/footer_bg_pattern.webp?w=960&fit=crop&fm=webp&auto=format 960w, https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/39cc1261-0d6c-4c24-9f2c-e47371dab616/footer_bg_pattern.webp?w=1920&fit=crop&fm=webp&auto=format 1920w" width="1920" data-astro-cid-sz7xmlte> <ul class="footer__links" data-astro-cid-sz7xmlte> <li data-astro-cid-sz7xmlte> <a data-link-name="footer|link-1|Support us|text" href="/about-us/support-us" target="_self" data-astro-cid-sz7xmlte="true">Support us</a> </li><li data-astro-cid-sz7xmlte> <a data-link-name="footer|link-2|Contact us|text" href="/about-us/contact-us" target="_self" data-astro-cid-sz7xmlte="true">Contact us</a> </li><li data-astro-cid-sz7xmlte> <a data-link-name="footer|link-3|Privacy|text" href="/privacy" target="_self" data-astro-cid-sz7xmlte="true">Privacy</a> </li><li data-astro-cid-sz7xmlte> <a data-link-name="footer|link-4|Cookies|text" href="/privacy/cookies" id="footerCookieLink" target="_self" data-astro-cid-sz7xmlte="true">Cookies</a> </li><li data-astro-cid-sz7xmlte> <button class="ot-sdk-show-settings cursor-pointer reset-button" tabindex="0" type="button" data-astro-cid-sz7xmlte> Manage cookies </button> </li><li data-astro-cid-sz7xmlte> <a data-link-name="footer|link-5|Policies|text" href="/about-us/what-we-do/policies" target="_self" data-astro-cid-sz7xmlte="true">Policies</a> </li><li data-astro-cid-sz7xmlte> <a data-link-name="footer|link-6|Modern slavery statement|text" href="/about-us/what-we-do/policies/modern-slavery-statement" target="_self" data-astro-cid-sz7xmlte="true">Modern slavery statement</a> </li><li data-astro-cid-sz7xmlte> <a data-link-name="footer|link-7|Careers|text" href="/about-us/careers" target="_self" data-astro-cid-sz7xmlte="true">Careers</a> </li><li data-astro-cid-sz7xmlte> <a data-link-name="footer|link-8|Refer a friend|text" href="/membership/refer-a-friend" target="_self" data-astro-cid-sz7xmlte="true">Refer a friend</a> </li><li data-astro-cid-sz7xmlte> <a data-link-name="footer|link-9|Advertise with us|text" href="/about-us/commercial-opportunities/advertising" target="_self" data-astro-cid-sz7xmlte="true">Advertise with us</a> </li><li data-astro-cid-sz7xmlte> <a data-link-name="footer|link-10|Media centre|text" href="/press" target="_self" data-astro-cid-sz7xmlte="true">Media centre</a> </li><li data-astro-cid-sz7xmlte> <a data-link-name="footer|link-11|Listen to RHS podcasts|text" href="/podcast" target="_self" data-astro-cid-sz7xmlte="true">Listen to RHS podcasts</a> </li> </ul> <aside aria-label="Advertisement" class="footer__promo" data-ad-div-id="ad-footer-leaderboard" data-ad-size-mapping="[[[768,0],[[728,90]]],[[0,0],[[320,50]]]]" data-ad-sizes="[[728,90],[320,50]]" data-ad-slot="true" data-ad-slot-path="/21682926971/Bottom_Leaderboard" data-astro-cid-sz7xmlte> <div class="footer__promo-slot" id="ad-footer-leaderboard" data-astro-cid-sz7xmlte></div> <div class="footer__promo-fallback" data-ad-fallback hidden data-astro-cid-sz7xmlte> <section class="promotional-footer" style="--promotional-footer-bg-primary:url(https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/8f0f7b30-1bc8-4b21-a73c-e6dd33729633/bg-magnolia-leaderboard-1.png);--promotional-footer-bg-secondary:url(https://assets-eu-01.kc-usercontent.com/ef2ce39f-5a18-0112-fd1e-ecd53c5b582b/96be0ef0-df37-4aa6-8e07-7f2f68ed6e46/bg-magnolia-leaderboard-2.png)" data-astro-cid-d6oyrcrn> <img alt="Grow" class="promotional-footer__image" decoding="async" loading="lazy" src="https://assets.rhs.org.uk/05836e9f-2692-012f-b4fe-e3f22d127fa9/39859389-8ffc-431b-8a83-47b311e75bfa/grow-app-phone.png" data-astro-cid-d6oyrcrn> <div class="promotional-footer__copy" data-astro-cid-d6oyrcrn> <div class="promotional-footer__brand-row" data-astro-cid-d6oyrcrn> <img alt="RHS Logo" class="promotional-footer__logo" src="/ui-assets/rhs-logo.svg" data-astro-cid-d6oyrcrn> <h2 class="promotional-footer__title" data-astro-cid-d6oyrcrn> <a class="promotional-footer__title-link" data-link-name="promotion_eb04ed09-922a-4236-be22-e5d22dbb46e9|primary|Grow|image-and-text" href="https://rhsgrow.onelink.me/430N/advbnrstatjun26" data-astro-cid-d6oyrcrn="true" target="_blank" rel="noopener noreferrer">Grow </a> </h2> </div> <p class="promotional-footer__subtitle" data-astro-cid-d6oyrcrn>The new app packed with trusted gardening know-how</p> </div> <a class="btn btn--secondary-alt btn--small btn--with-icon btn--icon-right promotional-footer__cta" href="https://rhsgrow.onelink.me/430N/advbnrstatjun26" target="_blank" rel="noopener noreferrer" data-ga data-link-name="promotion_eb04ed09-922a-4236-be22-e5d22dbb46e9|primary|Grow|button" data-astro-cid-d6oyrcrn="true" data-astro-cid-vnzlvqnm="true"><span class="btn__text" data-js="button-text" data-astro-cid-vnzlvqnm>Download app</span> <span aria-hidden="true" class="btn__icon btn__icon--right" data-astro-cid-vnzlvqnm><svg width="16" height="16" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" class="svg-inline--fa fa-angle-right" role="img" viewBox="0 0 256 512"><path fill="currentColor" d="M247.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L179.2 256 41.9 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg></span></a>  </section>  </div> </aside> <div class="footer__bottom" data-astro-cid-sz7xmlte> <p class="footer__copy" data-astro-cid-sz7xmlte>
+&copy; The Royal Horticultural Society 2026 </p> <p class="footer__charity" data-astro-cid-sz7xmlte>
+RHS Registered Charity no. 222879 / SC038262
+</p> </div> </div> </footer> <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    window.geofeed = (options) => {
+      if (options?.continent === 'EU' && options?.country !== 'GB') {
+        const footerCookieLink = document.getElementById('footerCookieLink');
+        footerCookieLink?.setAttribute('href', '/privacy/eu-cookies');
+      }
+    };
+
+    const script = document.createElement('script');
+    script.src =
+      'https://geolocation.onetrust.com/cookieconsentpub/v1/geo/location/geofeed';
+    script.async = true;
+    document.head.appendChild(script);
+  });
+</script>  <button aria-label="Back to top" class="back-to-top" type="button" data-astro-cid-wlspcwf4>   <span aria-hidden="true" class="back-to-top__icon" data-astro-cid-wlspcwf4><svg width="24" height="24" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-up" class="svg-inline--fa fa-chevron-up" role="img" viewBox="0 0 448 512"><path fill="currentColor" d="M201.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L224 173.3 54.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z"></path></svg></span>  </button>  <script>
+  (() => {
+    const btn = document.currentScript.previousElementSibling;
+    if (!btn) return;
+
+    const threshold = 150;
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
+
+    let isScrolling = false;
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (isScrolling) return;
+
+        isScrolling = true;
+        requestAnimationFrame(() => {
+          btn.classList.toggle(
+            'back-to-top--is-active',
+            window.scrollY > threshold
+          );
+          isScrolling = false;
+        });
+      },
+      { passive: true }
+    );
+
+    btn.addEventListener('click', () => {
+      try {
+        window.scrollTo({
+          top: 0,
+          behavior: prefersReducedMotion ? 'auto' : 'smooth',
+        });
+      } catch {
+        window.scrollTo(0, 0);
+      }
+    });
+  })();
+</script> </body></html><script type="module" src="/_astro/details.astro_astro_type_script_index_0_lang.oYU7bCPy.js"></script>
