@@ -38,16 +38,24 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  // why this order: quiz_questions.plant_id has no ON DELETE CASCADE (a
+  // plant shouldn't vanish just because a delete happens to cascade through
+  // it) — deleting the shared test plant *before* the test users left their
+  // quiz_questions rows still referencing it, which silently failed the
+  // delete (caught by a blanket try/catch) and leaked stray rows into the
+  // real plants table on every run. Users (and their quiz_questions, via
+  // quiz_attempts' cascade) must go first.
+  for (const user of createdUsers) {
+    await deleteTestUser(user.userId).catch(() => {});
+  }
+  await cleanupAllTestUsers().catch(() => {});
+
   const admin = createServiceRoleClient();
   try {
     await admin.from("plants").delete().eq("id", testPlantId);
   } catch {
     // best-effort cleanup
   }
-  for (const user of createdUsers) {
-    await deleteTestUser(user.userId).catch(() => {});
-  }
-  await cleanupAllTestUsers().catch(() => {});
 });
 
 describe("quiz_themes RLS", () => {
