@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npm run typecheck
+
+      # why unit tests before build, not after: the RLS/integration tests
+      # hit the real Supabase project directly (no dedicated CI/test
+      # project — see the app page's Decision Log) and share Supabase
+      # Auth's sign-in rate limit with local dev runs. Failing fast here
+      # avoids a wasted build if that limit is already exhausted for the
+      # window.
+      - run: npm run test
+
+      - run: npm run build
