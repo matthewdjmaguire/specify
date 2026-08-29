@@ -152,6 +152,7 @@ the hard way. (Mirrored in the Notion app page's Learnings section — keep both
   reuse. Treat bulk scraping as a standing, unresolved legal risk — mitigated for v1 by
   hotlinking images (never mirrored) and keeping the seed set small/curated rather than
   crawling their full ~306k-page catalogue.
+- **Supabase-js query builders are not real Promises — `.catch()` chained directly after a query throws `TypeError: ... .catch is not a function`.** Hit this twice writing RLS test cleanup (`quizzes.rls.test.ts`, then `plant-stats.rls.test.ts`) before it made it here. Use `try { await query } catch {}` instead of `query.catch(() => {})`.
 - **This shadcn install is built on Base UI, not Radix** — `shadcn init` picked `@base-ui/react`
   under the hood. Base UI has no `asChild` prop; its polymorphism API is a `render` prop
   instead (`<DropdownMenuItem render={<Link href="/x">X</Link>} />`, not

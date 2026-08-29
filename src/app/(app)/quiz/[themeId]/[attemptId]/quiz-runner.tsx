@@ -11,6 +11,7 @@ import { isCloseEnough } from "@/lib/quiz/fuzzy-match";
 import { buildFollowupQuestion, type FollowupCategory } from "@/lib/quiz/followup-questions";
 import { shuffle } from "@/lib/quiz/random-utils";
 import { submitAnswer } from "@/app/actions/quiz-questions";
+import { recordPlantMastery } from "@/app/actions/plant-stats";
 import type { QuizPlant } from "@/lib/quiz/types";
 
 type QuestionState = {
@@ -74,7 +75,13 @@ export function QuizRunner({
     setQuestions((prev) =>
       prev.map((q) => (q.questionId === current.questionId ? { ...q, status, userAnswer: value } : q)),
     );
-    await submitAnswer(current.questionId, status, value);
+    // why plant_stats only updates for the name question, not follow-ups:
+    // priority_weight (SPEC-010's selection input) is about "recognise this
+    // plant by name" specifically — see plant-stats.ts's own comment.
+    await Promise.all([
+      submitAnswer(current.questionId, status, value),
+      isFollowup ? Promise.resolve() : recordPlantMastery(current.plant.id, isCorrect),
+    ]);
   }
 
   async function handleIntermediateAnswer(option: QuizPlant) {
