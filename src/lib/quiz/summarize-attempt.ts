@@ -26,7 +26,7 @@ const STRENGTH_THRESHOLD = 0.75;
 // designer actually talks about strengths/weaknesses ("I'm solid on trees,
 // weak on climbers") than a Latin family name. Family is still a reasonable
 // fallback for the plants that have no habit recorded.
-function categoryFor(plant: { habit: string | null; family: string | null }): string | null {
+export function categoryFor(plant: { habit: string | null; family: string | null }): string | null {
   return plant.habit ?? plant.family ?? null;
 }
 
