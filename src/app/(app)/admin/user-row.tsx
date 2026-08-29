@@ -40,7 +40,7 @@ export function UserRow({ entry, currentUserId }: { entry: AdminDirectoryEntry; 
   }
 
   return (
-    <div className="flex flex-col gap-2 rounded-lg border p-3">
+    <div data-testid="user-row" className="flex flex-col gap-2 rounded-lg border p-3">
       <div className="flex items-center justify-between gap-4">
         <div>
           <p className="font-medium">
