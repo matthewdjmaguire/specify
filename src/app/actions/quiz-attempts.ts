@@ -120,3 +120,16 @@ export async function startQuizAttempt(input: StartQuizInput): Promise<string> {
 
   return startQuizAttemptCore(supabase, user.id, input);
 }
+
+export async function completeQuizAttemptCore(supabase: SupabaseClient, attemptId: string): Promise<void> {
+  const { error } = await supabase
+    .from("quiz_attempts")
+    .update({ completed_at: new Date().toISOString() })
+    .eq("id", attemptId);
+  if (error) throw error;
+}
+
+export async function completeQuizAttempt(attemptId: string): Promise<void> {
+  const supabase = await createClient();
+  return completeQuizAttemptCore(supabase, attemptId);
+}

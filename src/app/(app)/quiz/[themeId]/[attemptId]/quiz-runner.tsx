@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PlantFlashcard, type RevealLevel } from "@/components/quiz/plant-flashcard";
@@ -15,6 +16,7 @@ import { buildFollowupQuestion, type FollowupCategory } from "@/lib/quiz/followu
 import { shuffle } from "@/lib/quiz/random-utils";
 import { submitAnswer } from "@/app/actions/quiz-questions";
 import { recordPlantMastery } from "@/app/actions/plant-stats";
+import { completeQuizAttempt } from "@/app/actions/quiz-attempts";
 import type { QuizPlant } from "@/lib/quiz/types";
 
 type QuestionState = {
@@ -27,6 +29,7 @@ type QuestionState = {
 };
 
 export function QuizRunner({
+  attemptId,
   themeId,
   mode,
   questions: initialQuestions,
@@ -44,6 +47,8 @@ export function QuizRunner({
   }>;
   catalogue: QuizPlant[];
 }) {
+  const router = useRouter();
+  const [isFinishing, startFinishing] = useTransition();
   const [index, setIndex] = useState(0);
   const [questions, setQuestions] = useState<QuestionState[]>(() =>
     initialQuestions.map((q) => ({ ...q, userAnswer: null })),
@@ -126,6 +131,14 @@ export function QuizRunner({
   }
 
   const answeredIntermediateOption = intermediateOptions.find((o) => o.scientificName === current.userAnswer);
+  const isLastQuestion = index === questions.length - 1;
+
+  function handleFinish() {
+    startFinishing(async () => {
+      await completeQuizAttempt(attemptId);
+      router.push(`/quiz/${themeId}/${attemptId}/summary`);
+    });
+  }
 
   return (
     <div className="flex flex-1 flex-col items-center gap-6 p-8">
@@ -183,12 +196,13 @@ export function QuizRunner({
         <Button variant="outline" onClick={() => setIndex((i) => Math.max(0, i - 1))} disabled={index === 0}>
           Back
         </Button>
-        <Button
-          onClick={() => setIndex((i) => Math.min(questions.length - 1, i + 1))}
-          disabled={index === questions.length - 1}
-        >
-          Next
-        </Button>
+        {isLastQuestion ? (
+          <Button onClick={handleFinish} disabled={isFinishing}>
+            {isFinishing ? "Finishing…" : "Finish"}
+          </Button>
+        ) : (
+          <Button onClick={() => setIndex((i) => Math.min(questions.length - 1, i + 1))}>Next</Button>
+        )}
       </div>
     </div>
   );

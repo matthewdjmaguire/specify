@@ -1,6 +1,6 @@
 import { afterAll, describe, expect, it } from "vitest";
 import { cleanupAllTestUsers, deleteTestUser, createTestUser, type TestUser } from "@/test/rls-test-helpers";
-import { startQuizAttemptCore } from "./quiz-attempts";
+import { startQuizAttemptCore, completeQuizAttemptCore } from "./quiz-attempts";
 
 const createdUsers: TestUser[] = [];
 
@@ -159,5 +159,38 @@ describe("starting a quiz attempt (against the live schema)", () => {
       .select("question_type")
       .eq("attempt_id", attemptId);
     expect(questions!.every((q) => q.question_type === "name")).toBe(true);
+  });
+});
+
+describe("completing a quiz attempt", () => {
+  it("sets completed_at, which starts null", async () => {
+    const user = await newTestUser("completequiz");
+    const { data: theme } = await user.client
+      .from("quiz_themes")
+      .insert({ display_name: "Acer complete", prompt: "acer", owner_id: user.userId, is_global: false })
+      .select("id")
+      .single();
+    const attemptId = await startQuizAttemptAs(user, {
+      themeId: theme!.id,
+      mode: "learning",
+      geoScope: "Global",
+      questionCount: 2,
+    });
+
+    const { data: before } = await user.client
+      .from("quiz_attempts")
+      .select("completed_at")
+      .eq("id", attemptId)
+      .single();
+    expect(before!.completed_at).toBeNull();
+
+    await completeQuizAttemptCore(user.client, attemptId);
+
+    const { data: after } = await user.client
+      .from("quiz_attempts")
+      .select("completed_at")
+      .eq("id", attemptId)
+      .single();
+    expect(after!.completed_at).not.toBeNull();
   });
 });
