@@ -75,3 +75,26 @@ export async function cleanupAllTestUsers(): Promise<void> {
     await admin.auth.admin.deleteUser(user.id);
   }
 }
+
+// why: profiles_guard_delete blocks deleting any is_primary_admin row
+// unconditionally, even for service-role — by design, so the real primary
+// admin can never be removed. That means a test must never promote a
+// disposable test user to is_primary_admin: once set, nothing can ever
+// delete that row again (23 such rows leaked into the live database this
+// way before this helper existed — see CLAUDE.md's Learnings). Use this to
+// test primary-admin guard behaviour against the one real seeded row
+// instead — every assertion these guards exist for expects the operation to
+// fail and leave the row unchanged, so exercising them against the real row
+// is safe.
+export async function getPrimaryAdminUserId(): Promise<string> {
+  const admin = createServiceRoleClient();
+  const { data, error } = await admin.auth.admin.listUsers({ perPage: 1000 });
+  if (error) throw error;
+  const primaryAdmin = data.users.find((u) => u.email === "matthewdjmaguire@gmail.com");
+  if (!primaryAdmin) {
+    throw new Error(
+      "Seeded primary admin (matthewdjmaguire@gmail.com) not found — is this pointed at the right database?",
+    );
+  }
+  return primaryAdmin.id;
+}

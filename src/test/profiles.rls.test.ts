@@ -4,6 +4,7 @@ import {
   createServiceRoleClient,
   createTestUser,
   deleteTestUser,
+  getPrimaryAdminUserId,
   type TestUser,
 } from "./rls-test-helpers";
 
@@ -136,23 +137,22 @@ describe("profiles RLS", () => {
   });
 
   it("blocks demoting or deleting a primary-admin row, even via service-role", async () => {
-    const user = await newTestUser("primaryadmin");
+    // why the real seeded primary admin, not a disposable test user promoted
+    // to is_primary_admin: that promotion can never be undone (see
+    // getPrimaryAdminUserId's doc comment) — every assertion here expects
+    // the operation to fail and leave the row untouched, so it's safe to
+    // exercise directly against the one real row instead of creating an
+    // unrecoverable stray.
+    const primaryAdminId = await getPrimaryAdminUserId();
     const admin = createServiceRoleClient();
-
-    // Promote to primary admin first (simulating the seeded matthewdjmaguire@gmail.com row).
-    const { error: promoteError } = await admin
-      .from("profiles")
-      .update({ is_admin: true, is_primary_admin: true })
-      .eq("id", user.userId);
-    expect(promoteError).toBeNull();
 
     const { error: demoteError } = await admin
       .from("profiles")
       .update({ is_admin: false })
-      .eq("id", user.userId);
+      .eq("id", primaryAdminId);
     expect(demoteError).not.toBeNull();
 
-    const { error: deleteError } = await admin.from("profiles").delete().eq("id", user.userId);
+    const { error: deleteError } = await admin.from("profiles").delete().eq("id", primaryAdminId);
     expect(deleteError).not.toBeNull();
   });
 });
