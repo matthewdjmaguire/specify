@@ -1,0 +1,20 @@
+export type QuizPlant = {
+  id: string;
+  scientificName: string;
+  commonName: string | null;
+  description: string | null;
+  imageUrl: string | null;
+  family: string | null;
+  genus: string | null;
+  habit: string | null;
+  foliage: string | null;
+  soilTypes: string[];
+  moisture: string | null;
+  ph: string | null;
+  position: string[];
+  aspect: string | null;
+  exposure: string | null;
+  hardiness: string | null;
+  heightRange: string | null;
+  spreadRange: string | null;
+};
