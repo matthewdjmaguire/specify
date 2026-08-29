@@ -60,7 +60,14 @@ describe("weightedSampleWithoutReplacement", () => {
       { item: "heavy", weight: 50 },
       { item: "light", weight: 0.05 },
     ];
-    const trials = 2000;
+    // why 20000, not a smaller round number: at this weight ratio "light"
+    // wins any single draw roughly 1 time in 1000, so 2000 trials (the
+    // original count) has a real ~13% chance of never picking it even
+    // though the algorithm is working correctly — caught by an actual CI
+    // run flaking, not by local testing (Math.random varies run to run).
+    // 20000 trials pushes that false-failure rate to effectively zero
+    // (~1e-9) while still finishing in well under a second.
+    const trials = 20000;
     let heavyPickedFirst = 0;
     let lightEverPicked = 0;
     for (let i = 0; i < trials; i++) {
