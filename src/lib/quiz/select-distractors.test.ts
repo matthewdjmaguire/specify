@@ -8,6 +8,7 @@ function plant(overrides: Partial<QuizPlant> & { id: string }): QuizPlant {
     commonName: null,
     description: null,
     imageUrl: "https://example.com/a.jpg",
+    sourceUrl: null,
     family: null,
     genus: null,
     habit: null,

@@ -8,6 +8,14 @@ import {
 } from "./rls-test-helpers";
 
 const createdUsers: TestUser[] = [];
+// why tracked separately from createdUsers: a *global* quiz_themes row has
+// owner_id = null, so it is never cascade-deleted when a test user is
+// removed — unlike every other table these tests touch. Missing this was a
+// real bug: 14 stray "Curated Trees (updated)" global themes leaked into
+// the live app's real /quizzes page (one per full test-suite run since this
+// test was written) before it was caught via manual QA, not by the tests
+// themselves.
+const createdGlobalThemeIds: string[] = [];
 let testPlantId: string;
 
 async function newTestUser(label: string): Promise<TestUser> {
@@ -51,6 +59,13 @@ afterAll(async () => {
   await cleanupAllTestUsers().catch(() => {});
 
   const admin = createServiceRoleClient();
+  for (const themeId of createdGlobalThemeIds) {
+    try {
+      await admin.from("quiz_themes").delete().eq("id", themeId);
+    } catch {
+      // best-effort cleanup
+    }
+  }
   try {
     await admin.from("plants").delete().eq("id", testPlantId);
   } catch {
@@ -136,6 +151,7 @@ describe("quiz_themes RLS", () => {
       .select("id")
       .single();
     expect(createError).toBeNull();
+    createdGlobalThemeIds.push(created!.id);
 
     const { error: updateError } = await admin.client
       .from("quiz_themes")

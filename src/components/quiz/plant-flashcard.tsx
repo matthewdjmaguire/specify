@@ -11,12 +11,14 @@ function Field({ label, value }: { label: string; value: string }) {
   );
 }
 
-// why revealed is a prop, not baked into this component: Learning mode
-// always shows characteristics; Intermediate/Hard modes reuse this exact
-// card for the image but only reveal the name/characteristics after the
-// user answers — one component, one image-rendering implementation
-// (hotlinked, per the app's sourcing rules), two behaviours.
-export function PlantFlashcard({ plant, revealed }: { plant: QuizPlant; revealed: boolean }) {
+export type RevealLevel = "hidden" | "name" | "full";
+
+// why revealLevel is three states, not a boolean: per direct feedback, the
+// first (name) question only reveals the scientific name on answering —
+// the full characteristics card stays hidden until the *second* question
+// (the plant's first follow-up) has also been answered. A plain
+// revealed:boolean couldn't express the middle state.
+export function PlantFlashcard({ plant, revealLevel }: { plant: QuizPlant; revealLevel: RevealLevel }) {
   return (
     <Card className="w-full max-w-md overflow-hidden gap-0 py-0">
       <div className="relative aspect-4/3 w-full bg-muted">
@@ -31,23 +33,38 @@ export function PlantFlashcard({ plant, revealed }: { plant: QuizPlant; revealed
           </div>
         )}
       </div>
-      {revealed && (
+      {revealLevel !== "hidden" && (
         <CardContent className="flex flex-col gap-3 py-4">
           <div>
             <p className="text-lg font-semibold italic">{plant.scientificName}</p>
             {plant.commonName && <p className="text-sm text-muted-foreground">{plant.commonName}</p>}
           </div>
-          <dl className="grid grid-cols-2 gap-x-4 gap-y-2">
-            {plant.family && <Field label="Family" value={plant.family} />}
-            {plant.habit && <Field label="Habit" value={plant.habit} />}
-            {plant.hardiness && <Field label="Hardiness" value={plant.hardiness} />}
-            {plant.heightRange && <Field label="Height" value={plant.heightRange} />}
-            {plant.spreadRange && <Field label="Spread" value={plant.spreadRange} />}
-            {plant.soilTypes.length > 0 && <Field label="Soil" value={plant.soilTypes.join(", ")} />}
-            {plant.position.length > 0 && <Field label="Position" value={plant.position.join(", ")} />}
-            {plant.moisture && <Field label="Moisture" value={plant.moisture} />}
-          </dl>
-          {plant.description && <p className="text-sm text-muted-foreground">{plant.description}</p>}
+
+          {revealLevel === "full" && (
+            <>
+              <dl className="grid grid-cols-2 gap-x-4 gap-y-2">
+                {plant.family && <Field label="Family" value={plant.family} />}
+                {plant.habit && <Field label="Habit" value={plant.habit} />}
+                {plant.hardiness && <Field label="Hardiness" value={plant.hardiness} />}
+                {plant.heightRange && <Field label="Height" value={plant.heightRange} />}
+                {plant.spreadRange && <Field label="Spread" value={plant.spreadRange} />}
+                {plant.soilTypes.length > 0 && <Field label="Soil" value={plant.soilTypes.join(", ")} />}
+                {plant.position.length > 0 && <Field label="Position" value={plant.position.join(", ")} />}
+                {plant.moisture && <Field label="Moisture" value={plant.moisture} />}
+              </dl>
+              {plant.description && <p className="text-sm text-muted-foreground">{plant.description}</p>}
+              {plant.sourceUrl && (
+                <a
+                  href={plant.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                >
+                  View on RHS →
+                </a>
+              )}
+            </>
+          )}
         </CardContent>
       )}
     </Card>

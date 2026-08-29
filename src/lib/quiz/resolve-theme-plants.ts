@@ -1,15 +1,21 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { QuizPlant } from "./types";
 
-const PLANT_COLUMNS =
-  "id, scientific_name, common_name, description, image_url, family, genus, habit, foliage, soil_types, moisture, ph, position, aspect, exposure, hardiness, height_range, spread_range, geo_tags";
+// why exported (PLANT_COLUMNS, PlantRow, toQuizPlant): this was the second
+// place in the app to hand-write "select these plant columns, map snake_case
+// to QuizPlant" (the attempt page had its own copy) — consolidated here as
+// the one source of truth so a new field (like sourceUrl) only needs adding
+// once.
+export const PLANT_COLUMNS =
+  "id, scientific_name, common_name, description, image_url, source_url, family, genus, habit, foliage, soil_types, moisture, ph, position, aspect, exposure, hardiness, height_range, spread_range, geo_tags";
 
-type PlantRow = {
+export type PlantRow = {
   id: string;
   scientific_name: string;
   common_name: string | null;
   description: string | null;
   image_url: string | null;
+  source_url: string | null;
   family: string | null;
   genus: string | null;
   habit: string | null;
@@ -25,13 +31,14 @@ type PlantRow = {
   spread_range: string | null;
 };
 
-function toQuizPlant(row: PlantRow): QuizPlant {
+export function toQuizPlant(row: PlantRow): QuizPlant {
   return {
     id: row.id,
     scientificName: row.scientific_name,
     commonName: row.common_name,
     description: row.description,
     imageUrl: row.image_url,
+    sourceUrl: row.source_url,
     family: row.family,
     genus: row.genus,
     habit: row.habit,

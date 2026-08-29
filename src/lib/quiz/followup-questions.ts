@@ -1,7 +1,19 @@
 import type { QuizPlant } from "./types";
 import { pickRandom, shuffle } from "./random-utils";
 
-export const FOLLOWUP_CATEGORIES = ["soil", "hardiness", "position", "height", "spread"] as const;
+// why this exact set: matches every field the flashcard itself shows
+// (PlantFlashcard) — per direct feedback, "make these all potential
+// secondary questions" rather than the original narrower subset.
+export const FOLLOWUP_CATEGORIES = [
+  "soil",
+  "hardiness",
+  "position",
+  "height",
+  "spread",
+  "family",
+  "habit",
+  "moisture",
+] as const;
 export type FollowupCategory = (typeof FOLLOWUP_CATEGORIES)[number];
 
 export const FOLLOWUP_CATEGORY_LABELS: Record<FollowupCategory, string> = {
@@ -10,6 +22,9 @@ export const FOLLOWUP_CATEGORY_LABELS: Record<FollowupCategory, string> = {
   position: "Position",
   height: "Max Height",
   spread: "Max Spread",
+  family: "Family",
+  habit: "Habit",
+  moisture: "Moisture",
 };
 
 export function followupCategoryValue(plant: QuizPlant, category: FollowupCategory): string | null {
@@ -24,6 +39,12 @@ export function followupCategoryValue(plant: QuizPlant, category: FollowupCatego
       return plant.heightRange;
     case "spread":
       return plant.spreadRange;
+    case "family":
+      return plant.family;
+    case "habit":
+      return plant.habit;
+    case "moisture":
+      return plant.moisture;
   }
 }
 

@@ -1,15 +1,16 @@
 "use client";
 
-import { PlantFlashcard } from "./plant-flashcard";
 import type { QuizPlant } from "@/lib/quiz/types";
 
+// why this no longer renders PlantFlashcard itself: see HardQuestion's
+// comment — the two-stage reveal is computed once, in the runner.
 export function IntermediateQuestion({
-  plant,
+  correctPlantId,
   options,
   answeredId,
   onSelect,
 }: {
-  plant: QuizPlant;
+  correctPlantId: string;
   options: QuizPlant[];
   answeredId: string | null;
   onSelect: (option: QuizPlant) => void;
@@ -18,10 +19,9 @@ export function IntermediateQuestion({
 
   return (
     <div className="flex w-full max-w-md flex-col gap-4">
-      <PlantFlashcard plant={plant} revealed={showFeedback} />
       <div className="flex flex-col gap-2">
         {options.map((option) => {
-          const isCorrect = option.id === plant.id;
+          const isCorrect = option.id === correctPlantId;
           const isSelected = option.id === answeredId;
           return (
             <button

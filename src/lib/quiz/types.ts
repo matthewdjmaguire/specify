@@ -4,6 +4,10 @@ export type QuizPlant = {
   commonName: string | null;
   description: string | null;
   imageUrl: string | null;
+  // why kept even though the quiz UI never needs to identify the source
+  // site by name: it's the one link back to RHS's own page for this plant,
+  // shown on the flashcard per the app's "always credit the source" rule.
+  sourceUrl: string | null;
   family: string | null;
   genus: string | null;
   habit: string | null;

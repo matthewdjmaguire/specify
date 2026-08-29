@@ -2,17 +2,18 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { PlantFlashcard } from "./plant-flashcard";
-import type { QuizPlant } from "@/lib/quiz/types";
 
+// why this no longer renders PlantFlashcard itself: the two-stage reveal
+// (name only after Q1, full card only after Q2) is computed once in the
+// runner and applies uniformly across Intermediate/Hard/follow-up
+// questions — duplicating that logic per question-type component would
+// have meant three places to keep in sync.
 export function HardQuestion({
-  plant,
   answered,
   isCorrect,
   previousAnswer,
   onSubmit,
 }: {
-  plant: QuizPlant;
   answered: boolean;
   isCorrect: boolean | null;
   previousAnswer: string | null;
@@ -28,7 +29,6 @@ export function HardQuestion({
 
   return (
     <div className="flex w-full max-w-md flex-col gap-4">
-      <PlantFlashcard plant={plant} revealed={answered} />
       {!answered ? (
         <form onSubmit={handleSubmit} className="flex gap-2">
           <input

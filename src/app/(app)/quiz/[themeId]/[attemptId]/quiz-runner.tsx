@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PlantFlashcard } from "@/components/quiz/plant-flashcard";
+import { PlantFlashcard, type RevealLevel } from "@/components/quiz/plant-flashcard";
 import { IntermediateQuestion } from "@/components/quiz/intermediate-question";
 import { HardQuestion } from "@/components/quiz/hard-question";
 import { CharacteristicQuestion } from "@/components/quiz/characteristic-question";
@@ -25,11 +27,13 @@ type QuestionState = {
 };
 
 export function QuizRunner({
+  themeId,
   mode,
   questions: initialQuestions,
   catalogue,
 }: {
   attemptId: string;
+  themeId: string;
   mode: "learning" | "intermediate" | "hard";
   questions: Array<{
     questionId: string;
@@ -49,6 +53,29 @@ export function QuizRunner({
   const followupCategory = isFollowup
     ? (current.questionType.split(":")[1] as FollowupCategory)
     : null;
+
+  // why grouped by plant, not just looking at `current`: the two-stage
+  // reveal (name only after the ID question, full card only after the
+  // *next* question for that same plant) needs to know the status of the
+  // plant's other questions, not just the one currently on screen — e.g.
+  // viewing a follow-up needs to know whether the ID question before it was
+  // answered, and viewing the ID question needs to know whether a later
+  // follow-up has already been answered (if the user jumped ahead via the
+  // rail and then back).
+  const revealLevel: RevealLevel = useMemo(() => {
+    if (!current) return "hidden";
+    if (mode === "learning") return "full";
+    const group = questions.filter((q) => q.plant.id === current.plant.id);
+    const idAnswered = group[0]?.status !== "unanswered";
+    if (!idAnswered) return "hidden";
+    // why group.length <= 1 counts as "satisfied": a plant with no
+    // follow-up questions at all (followup_count=0, or this plant had no
+    // populated categories) has no "second question" to wait for — reveal
+    // the full card right after the ID question instead of never.
+    const secondAnswered = group.length <= 1 || group[1]?.status !== "unanswered";
+    return secondAnswered ? "full" : "name";
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [current?.plant.id, questions, mode]);
 
   // why useMemo keyed on questionId (not state): options/questions must stay
   // stable across back/forward navigation within one attempt — revisiting an
@@ -102,34 +129,40 @@ export function QuizRunner({
 
   return (
     <div className="flex flex-1 flex-col items-center gap-6 p-8">
+      <div className="flex w-full max-w-2xl items-center justify-end">
+        {/* why render, not asChild: this shadcn install is Base UI, not
+            Radix — see CLAUDE.md's Learnings. */}
+        <Button
+          variant="ghost"
+          size="sm"
+          render={
+            <Link href={`/quiz/${themeId}`}>
+              <X className="size-4" />
+              Exit
+            </Link>
+          }
+        />
+      </div>
+
       <QuizProgressRail
-        items={questions.map((q) => ({
-          status: q.status,
-          isFollowup: q.questionType.startsWith("characteristic:"),
-        }))}
+        items={questions.map((q) => ({ status: q.status }))}
         currentIndex={index}
         onJump={setIndex}
       />
-      <p className="text-sm text-muted-foreground">
-        Question {index + 1} of {questions.length}
-      </p>
+
+      <PlantFlashcard plant={current.plant} revealLevel={revealLevel} />
 
       {isFollowup && followupQuestion && (
-        <>
-          <PlantFlashcard plant={current.plant} revealed={current.status !== "unanswered"} />
-          <CharacteristicQuestion
-            question={followupQuestion}
-            answeredValue={current.userAnswer}
-            onSelect={handleFollowupAnswer}
-          />
-        </>
+        <CharacteristicQuestion
+          question={followupQuestion}
+          answeredValue={current.userAnswer}
+          onSelect={handleFollowupAnswer}
+        />
       )}
-
-      {!isFollowup && mode === "learning" && <PlantFlashcard plant={current.plant} revealed />}
 
       {!isFollowup && mode === "intermediate" && (
         <IntermediateQuestion
-          plant={current.plant}
+          correctPlantId={current.plant.id}
           options={intermediateOptions}
           answeredId={answeredIntermediateOption?.id ?? null}
           onSelect={handleIntermediateAnswer}
@@ -139,7 +172,6 @@ export function QuizRunner({
       {!isFollowup && mode === "hard" && (
         <HardQuestion
           key={current.questionId}
-          plant={current.plant}
           answered={current.status !== "unanswered"}
           isCorrect={current.status === "correct"}
           previousAnswer={current.userAnswer}
