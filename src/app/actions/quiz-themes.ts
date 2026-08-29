@@ -14,6 +14,16 @@ export type QuizThemeInput = {
 // create/edit a global theme is rejected by the database itself, not by
 // this function remembering to check first.
 
+// why a blank prompt defaults to the display name rather than staying
+// blank: a blank prompt means "no filter — match every plant in the
+// catalogue" (resolveThemePlants treats it the same as Lucky Dip's own
+// always-blank prompt), which isn't what someone leaving the field empty
+// actually wants — and it was also silently giving every such theme the
+// exact same catalogue-wide thumbnail on /quizzes.
+function resolvePrompt(input: QuizThemeInput): string {
+  return input.prompt.trim() || input.displayName;
+}
+
 export async function createQuizTheme(input: QuizThemeInput): Promise<string> {
   const supabase = await createClient();
   const {
@@ -25,7 +35,7 @@ export async function createQuizTheme(input: QuizThemeInput): Promise<string> {
     .from("quiz_themes")
     .insert({
       display_name: input.displayName,
-      prompt: input.prompt,
+      prompt: resolvePrompt(input),
       owner_id: user.id,
       is_global: false,
     })
@@ -41,7 +51,7 @@ export async function updateQuizTheme(id: string, input: QuizThemeInput): Promis
   const supabase = await createClient();
   const { error } = await supabase
     .from("quiz_themes")
-    .update({ display_name: input.displayName, prompt: input.prompt })
+    .update({ display_name: input.displayName, prompt: resolvePrompt(input) })
     .eq("id", id);
   if (error) throw error;
 
@@ -64,7 +74,7 @@ export async function createGlobalQuizTheme(input: QuizThemeInput): Promise<stri
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("quiz_themes")
-    .insert({ display_name: input.displayName, prompt: input.prompt, owner_id: null, is_global: true })
+    .insert({ display_name: input.displayName, prompt: resolvePrompt(input), owner_id: null, is_global: true })
     .select("id")
     .single();
   if (error) throw error;

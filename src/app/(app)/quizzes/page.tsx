@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { filterPlantsByPrompt, PLANT_COLUMNS, toQuizPlant, type PlantRow } from "@/lib/quiz/resolve-theme-plants";
 import type { QuizPlant } from "@/lib/quiz/types";
@@ -30,7 +31,13 @@ export default async function QuizzesPage() {
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-6 md:p-8">
-      <h1 className="text-2xl font-semibold tracking-tight">Quizzes</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold tracking-tight">Quizzes</h1>
+        <div className="flex gap-2">
+          <Button variant="outline" render={<Link href="/settings/quizzes">Manage quizzes</Link>} />
+          <Button render={<Link href="/settings/quizzes/new">Create quiz</Link>} />
+        </div>
+      </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {themes.map((theme) => (
           <Link key={theme.id} href={`/quiz/${theme.id}`}>

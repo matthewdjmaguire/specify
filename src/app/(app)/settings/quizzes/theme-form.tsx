@@ -62,16 +62,17 @@ export function ThemeForm({
       </div>
       <div className="flex flex-col gap-1.5">
         <label htmlFor="prompt" className="text-sm font-medium">
-          Prompt
+          Prompt <span className="font-normal text-muted-foreground">(optional)</span>
         </label>
         <p className="text-xs text-muted-foreground">
-          Free text used to filter plants — matches against name, family, habit, soil, position, and more.
+          Free text used to filter plants — matches against name, family, habit, soil, position, and more. Leave
+          blank to use the display name above as the filter.
         </p>
         <input
           id="prompt"
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
-          placeholder="e.g. trees, shade, acid soil"
+          placeholder="e.g. trees, shade, acid soil — or leave blank"
           className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
         />
       </div>
