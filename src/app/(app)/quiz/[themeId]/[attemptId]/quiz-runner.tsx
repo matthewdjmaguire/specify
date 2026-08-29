@@ -6,6 +6,7 @@ import { PlantFlashcard } from "@/components/quiz/plant-flashcard";
 import { IntermediateQuestion } from "@/components/quiz/intermediate-question";
 import { HardQuestion } from "@/components/quiz/hard-question";
 import { CharacteristicQuestion } from "@/components/quiz/characteristic-question";
+import { QuizProgressRail } from "@/components/quiz/progress-rail";
 import { selectDistractors } from "@/lib/quiz/select-distractors";
 import { isCloseEnough } from "@/lib/quiz/fuzzy-match";
 import { buildFollowupQuestion, type FollowupCategory } from "@/lib/quiz/followup-questions";
@@ -101,6 +102,14 @@ export function QuizRunner({
 
   return (
     <div className="flex flex-1 flex-col items-center gap-6 p-8">
+      <QuizProgressRail
+        items={questions.map((q) => ({
+          status: q.status,
+          isFollowup: q.questionType.startsWith("characteristic:"),
+        }))}
+        currentIndex={index}
+        onJump={setIndex}
+      />
       <p className="text-sm text-muted-foreground">
         Question {index + 1} of {questions.length}
       </p>
