@@ -1,3 +1,5 @@
+@AGENTS.md
+
 # Specify
 
 > **Preset:** Quick-MVP. A flashcard/quiz app that helps garden designers learn plant

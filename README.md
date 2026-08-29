@@ -16,9 +16,31 @@ architecture, data model, and backlog.
 
 ## Running locally
 
-_Not yet scaffolded — this section will be filled in as part of SPEC-002/SPEC-003._
+```bash
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
 
 ## Environment variables
 
-_Not yet defined — will be documented here once Supabase/Vercel are provisioned
-(SPEC-002)._
+Pulled automatically from the linked Vercel project (Supabase provisioned via the Vercel
+Marketplace integration):
+
+```bash
+vercel env pull .env.local
+```
+
+Key variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (client-safe),
+`SUPABASE_SERVICE_ROLE_KEY` (server-side only, never exposed to the browser),
+`POSTGRES_URL_NON_POOLING` (direct connection, used for applying migrations).
+
+## Database migrations
+
+Version-controlled under `supabase/migrations/`. Applied directly via `psql` against
+`POSTGRES_URL_NON_POOLING` (no Supabase CLI login required):
+
+```bash
+psql "$POSTGRES_URL_NON_POOLING" -f supabase/migrations/<file>.sql
+```

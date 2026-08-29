@@ -1,0 +1,7 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Specify logo">
+  <circle cx="24" cy="24" r="22" fill="#DCE6C4"/>
+  <path d="M24 34V20" stroke="#4C5C33" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M24 24C24 24 16 24 14 16C14 16 24 14 24 24Z" fill="#6B7F45"/>
+  <path d="M24 20C24 20 32 20 34 12C34 12 24 10 24 20Z" fill="#87996E"/>
+  <circle cx="24" cy="35" r="2.5" fill="#4C5C33"/>
+</svg>
