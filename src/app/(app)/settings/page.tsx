@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SettingsForm } from "./settings-form";
 import { AvatarUpload } from "./avatar-upload";
+import { ExportButton } from "./export-button";
 import { Button } from "@/components/ui/button";
 
 export default async function SettingsPage() {
@@ -35,8 +36,9 @@ export default async function SettingsPage() {
         }}
       />
 
-      <div className="w-full max-w-md border-t pt-6">
-        <Button variant="outline" render={<Link href="/settings/quizzes">Manage quiz themes</Link>} />
+      <div className="flex w-full max-w-md flex-col gap-3 border-t pt-6">
+        <Button variant="outline" render={<Link href="/settings/quizzes">Manage quiz themes</Link>} className="w-fit" />
+        <ExportButton />
       </div>
     </div>
   );
