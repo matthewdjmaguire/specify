@@ -1,9 +1,9 @@
--- Admin-triggered plant ingestion, processed incrementally by a Vercel Cron
--- job rather than a single request — RHS's page-fetch rate limit (350ms
--- between requests, unchanged from the original SPEC-001 scraper) means a
--- run of any real size would exceed a serverless function's execution
--- window, so a job is worked in small ticks across repeated cron
--- invocations instead of one long-running request.
+-- Admin-triggered plant ingestion, processed incrementally (the admin page
+-- drives repeated ticks while it's open) rather than a single request —
+-- RHS's page-fetch rate limit (350ms between requests, unchanged from the
+-- original SPEC-001 scraper) means a run of any real size would exceed a
+-- serverless function's execution window, so a job is worked in small ticks
+-- across repeated calls instead of one long-running request.
 create table public.plant_import_jobs (
   id uuid primary key default gen_random_uuid(),
   requested_by uuid references auth.users (id) on delete set null,

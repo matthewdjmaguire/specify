@@ -7,10 +7,13 @@ import { parsePlantPage, type PlantRecord } from "../../../scripts/lib/parse-rhs
 // actually depends on — an admin-triggered job must be no heavier per
 // request than the manual process it's replacing.
 const REQUEST_DELAY_MS = 350;
-// why bounded per tick, not "process the whole job": a serverless function
-// has a real execution ceiling, and this runs on a repeating cron tick, so
-// each invocation only needs to make forward progress, not finish the job.
-const URLS_PER_TICK = 12;
+// why bounded per tick, not "process the whole job" in one call: a job is
+// driven by the admin page calling this repeatedly (every few seconds)
+// while it's open, not a single request — Vercel Cron would be the more
+// obvious fit, but per-minute schedules need a paid plan tier this project
+// doesn't have, and client-driven ticks turn out faster anyway (a few
+// seconds apart vs. once a minute) as long as the admin leaves the tab open.
+const URLS_PER_TICK = 8;
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -54,10 +57,10 @@ type JobRow = {
   imported_count: number;
 };
 
-// why processes exactly one job, one tick, per call: the cron route calls
-// this once per invocation against whichever job is oldest and unfinished —
-// simpler to reason about than a single function juggling multiple jobs'
-// worth of state.
+// why processes exactly one job, one tick, per call: the admin page's tick
+// server action calls this once per invocation against whichever job is
+// oldest and unfinished — simpler to reason about than a single function
+// juggling multiple jobs' worth of state.
 export async function processImportJobTick(supabase: SupabaseClient, job: JobRow): Promise<void> {
   let candidateUrls = job.candidate_urls;
   if (candidateUrls === null) {

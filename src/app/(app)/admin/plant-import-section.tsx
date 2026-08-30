@@ -3,7 +3,9 @@
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { createImportJob, type ImportJob } from "@/app/actions/plant-import";
+import { createImportJob, processNextImportJobTick, type ImportJob } from "@/app/actions/plant-import";
+
+const TICK_PAUSE_MS = 1500;
 
 const STATUS_LABEL: Record<ImportJob["status"], string> = {
   pending: "Queued",
@@ -46,14 +48,34 @@ export function PlantImportSection({ initialJobs }: { initialJobs: ImportJob[] }
 
   const hasActiveJob = initialJobs.some((j) => j.status === "pending" || j.status === "running");
 
-  // why poll only while something's actually in flight: a job is worked by
-  // a once-a-minute Vercel Cron tick (see vercel.json), not this page — a
-  // fixed short poll keeps progress visibly moving without hammering the
-  // server once every job has settled into done/failed.
+  // why this page drives ticks itself, not a Vercel Cron job: per-minute
+  // cron schedules need a paid plan tier this project doesn't have — a
+  // sequential await-loop while the admin has the page open turns out
+  // faster anyway (seconds apart, not once a minute). It stops as soon as
+  // hasActiveJob goes false (derived fresh from props on every
+  // router.refresh() below), and the cancelled flag stops a stray tick from
+  // landing after unmount.
   useEffect(() => {
     if (!hasActiveJob) return;
-    const interval = setInterval(() => router.refresh(), 5000);
-    return () => clearInterval(interval);
+    let cancelled = false;
+
+    async function loop() {
+      while (!cancelled) {
+        try {
+          await processNextImportJobTick();
+        } catch {
+          // surfaced via the job's own error_message once refreshed below
+        }
+        if (cancelled) return;
+        router.refresh();
+        await new Promise((resolve) => setTimeout(resolve, TICK_PAUSE_MS));
+      }
+    }
+
+    loop();
+    return () => {
+      cancelled = true;
+    };
   }, [hasActiveJob, router]);
 
   function handleSubmit(e: React.FormEvent) {
@@ -74,9 +96,9 @@ export function PlantImportSection({ initialJobs }: { initialJobs: ImportJob[] }
     <section className="flex w-full max-w-2xl flex-col gap-3">
       <h2 className="text-lg font-medium">Plant catalogue</h2>
       <p className="text-xs text-muted-foreground">
-        Imports run a few pages at a time via a scheduled job (respecting RHS&apos;s request rate) — a job may take
-        several minutes to finish. Capped at 100 plants per job by design; this tops up the curated seed set, not a
-        general-purpose crawler.
+        Imports run a few pages at a time (respecting RHS&apos;s request rate) while this page stays open — a job may
+        take a minute or two to finish. Capped at 100 plants per job by design; this tops up the curated seed set,
+        not a general-purpose crawler.
       </p>
       <form onSubmit={handleSubmit} className="flex flex-wrap items-end gap-2">
         <div className="flex flex-col gap-1">
