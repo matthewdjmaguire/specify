@@ -23,12 +23,26 @@ export function FavouritePlantCard({
     if (!next) onUnfavourite();
   }
 
+  // why role="button" divs, not nested <button>s: each card wraps a
+  // FavouriteButton (itself a <button>) inside its own expand/collapse
+  // toggle — a <button> inside a <button> is invalid HTML that the browser
+  // silently un-nests, causing a real React hydration mismatch, not just a
+  // lint nit.
+  function handleToggleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onToggleExpand();
+    }
+  }
+
   if (!showThumbnail) {
     return (
       <div className="border-b last:border-b-0">
-        <button
-          type="button"
+        <div
+          role="button"
+          tabIndex={0}
           onClick={onToggleExpand}
+          onKeyDown={handleToggleKeyDown}
           aria-expanded={expanded}
           className="flex w-full items-center justify-between gap-3 py-2.5 text-left"
         >
@@ -39,7 +53,7 @@ export function FavouritePlantCard({
             {plant.commonName && <span className="text-sm text-muted-foreground"> — {plant.commonName}</span>}
           </span>
           <FavouriteButton plantId={plant.id} initialIsFavourite onToggle={handleFavouriteToggle} />
-        </button>
+        </div>
         {expanded && (
           <div className="flex flex-col gap-3 pb-4">
             <PlantDetails plant={plant} />
@@ -51,7 +65,14 @@ export function FavouritePlantCard({
 
   return (
     <Card className="h-full gap-0 overflow-hidden py-0">
-      <button type="button" onClick={onToggleExpand} aria-expanded={expanded} className="block w-full text-left">
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={onToggleExpand}
+        onKeyDown={handleToggleKeyDown}
+        aria-expanded={expanded}
+        className="block w-full text-left"
+      >
         <div className="relative aspect-4/3 w-full bg-muted">
           {plant.imageUrl ? (
             <Image src={plant.imageUrl} alt="" fill unoptimized className="object-cover" />
@@ -69,7 +90,7 @@ export function FavouritePlantCard({
           <p className="text-sm font-medium italic">{plant.scientificName}</p>
           {plant.commonName && <p className="text-xs text-muted-foreground">{plant.commonName}</p>}
         </div>
-      </button>
+      </div>
       {expanded && (
         <div className="flex flex-col gap-3 px-4 pb-4">
           <PlantDetails plant={plant} />
