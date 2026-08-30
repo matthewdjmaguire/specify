@@ -61,7 +61,17 @@ export async function updateQuizTheme(id: string, input: QuizThemeInput): Promis
 export async function deleteQuizTheme(id: string): Promise<void> {
   const supabase = await createClient();
   const { error } = await supabase.from("quiz_themes").delete().eq("id", id);
-  if (error) throw error;
+  if (error) {
+    // why check the Postgres code, not just rethrow: a theme with existing
+    // quiz_attempts now fails on the FK's `on delete restrict` (added after
+    // the 2026-08-30 security review found the prior `cascade` let deleting
+    // a global theme silently destroy every user's attempts for it) — give
+    // a clear message instead of a raw constraint-violation error.
+    if (error.code === "23503") {
+      throw new Error("This theme has quiz attempts against it and can't be deleted.");
+    }
+    throw error;
+  }
 
   revalidatePath("/", "layout");
 }

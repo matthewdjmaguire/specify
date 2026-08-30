@@ -35,4 +35,24 @@ describe("generateQuizHistoryCsv", () => {
   it("returns just the header for no attempts", () => {
     expect(generateQuizHistoryCsv([])).toBe("Theme,Mode,Date,Score");
   });
+
+  it.each(["=", "+", "-", "@"])(
+    "neutralizes a theme name starting with '%s' to prevent formula injection",
+    (prefix) => {
+      const csv = generateQuizHistoryCsv([row({ themeName: `${prefix}cmd` })]);
+      const themeField = csv.split("\r\n")[1].split(",")[0];
+      expect(themeField).toBe(`'${prefix}cmd`);
+    },
+  );
+
+  it("neutralizes a leading formula character even when the field also needs quoting", () => {
+    const csv = generateQuizHistoryCsv([row({ themeName: '=HYPERLINK("http://evil.example")' })]);
+    const themeField = csv.split("\r\n")[1].split(",")[0];
+    expect(themeField).toBe('"\'=HYPERLINK(""http://evil.example"")"');
+  });
+
+  it("leaves a theme name starting with a plain letter untouched", () => {
+    const csv = generateQuizHistoryCsv([row({ themeName: "Trees" })]);
+    expect(csv.split("\r\n")[1].startsWith("Trees,")).toBe(true);
+  });
 });

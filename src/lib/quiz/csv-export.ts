@@ -10,11 +10,17 @@ export type AttemptExportRow = {
 // why quote-and-escape rather than trust the input: theme display names are
 // free text the user typed themselves — a comma or line break in a name
 // would otherwise silently corrupt the CSV's column structure.
+//
+// why also neutralize a leading =/+/-/@: those trigger formula evaluation in
+// Excel/Sheets even inside a quoted field (CWE-1236) — a theme named e.g.
+// `=HYPERLINK("http://evil.example",...)` would execute as a live formula
+// when the exported CSV is opened, not just display as text.
 function csvField(value: string): string {
-  if (/[",\r\n]/.test(value)) {
-    return `"${value.replace(/"/g, '""')}"`;
+  const escaped = /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
+  if (/[",\r\n]/.test(escaped)) {
+    return `"${escaped.replace(/"/g, '""')}"`;
   }
-  return value;
+  return escaped;
 }
 
 export function generateQuizHistoryCsv(rows: AttemptExportRow[]): string {
