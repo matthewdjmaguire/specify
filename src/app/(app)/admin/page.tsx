@@ -2,9 +2,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAdminDirectory } from "@/app/actions/admin";
+import { getImportJobs } from "@/app/actions/plant-import";
 import { Button } from "@/components/ui/button";
 import { ThemeRow } from "../settings/quizzes/theme-row";
 import { UserRow } from "./user-row";
+import { PlantImportSection } from "./plant-import-section";
 
 export default async function AdminPage() {
   const supabase = await createClient();
@@ -20,13 +22,14 @@ export default async function AdminPage() {
   // benefits from confirming the route exists.
   if (!profile?.is_admin) redirect("/");
 
-  const [directory, { data: globalThemes }] = await Promise.all([
+  const [directory, { data: globalThemes }, importJobs] = await Promise.all([
     getAdminDirectory(),
     supabase
       .from("quiz_themes")
       .select("id, display_name, prompt")
       .eq("is_global", true)
       .order("display_name"),
+    getImportJobs(),
   ]);
 
   return (
@@ -53,6 +56,8 @@ export default async function AdminPage() {
           ))}
         </div>
       </section>
+
+      <PlantImportSection initialJobs={importJobs} />
     </div>
   );
 }

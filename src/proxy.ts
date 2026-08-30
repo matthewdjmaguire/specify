@@ -4,7 +4,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/sign-in", "/auth"];
+// why /api/cron here too: it has its own bearer-token check (CRON_SECRET)
+// against the request Vercel Cron itself sends, which carries no user
+// session — gating it behind a signed-in user would make it uncallable.
+const PUBLIC_PATHS = ["/sign-in", "/auth", "/api/cron"];
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
