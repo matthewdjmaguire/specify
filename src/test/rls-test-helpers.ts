@@ -34,6 +34,32 @@ export type TestUser = {
 // and signing in with a password gives a genuine authenticated session/JWT to
 // test RLS policies against — the only way to actually exercise `auth.uid()`
 // and `auth.role()` as Postgres itself evaluates them, rather than guessing.
+function isRateLimitError(error: { status?: number; message?: string } | null): boolean {
+  return error?.status === 429 || (error?.message?.toLowerCase().includes("rate limit") ?? false);
+}
+
+// why retry with backoff: signInWithPassword hits Supabase Auth's public,
+// per-IP sign-in rate limit (unlike admin.createUser above, which goes
+// through the service-role admin API and isn't subject to it) — CI runs
+// dozens of these within seconds from GitHub Actions' shared runner IP pool
+// and reliably tripped it (2026-08-30, four CI runs in a row on the same
+// push). Spreading retries out over a few seconds lets the suite finish
+// inside the rate limit window instead of failing outright.
+async function signInWithRetry(
+  client: SupabaseClient,
+  email: string,
+  password: string,
+): Promise<{ session: { access_token: string } | null; error: { status?: number; message?: string } | null }> {
+  const delaysMs = [1000, 2000, 4000, 8000];
+  for (let attempt = 0; ; attempt++) {
+    const { data, error } = await client.auth.signInWithPassword({ email, password });
+    if (!error || !isRateLimitError(error) || attempt >= delaysMs.length) {
+      return { session: data.session, error };
+    }
+    await new Promise((resolve) => setTimeout(resolve, delaysMs[attempt]));
+  }
+}
+
 export async function createTestUser(label: string): Promise<TestUser> {
   const admin = createServiceRoleClient();
   const email = `${label}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}${TEST_EMAIL_SUFFIX}`;
@@ -48,11 +74,8 @@ export async function createTestUser(label: string): Promise<TestUser> {
   }
 
   const client = createAnonClient();
-  const { data: signedIn, error: signInError } = await client.auth.signInWithPassword({
-    email,
-    password: TEST_PASSWORD,
-  });
-  if (signInError || !signedIn.session) {
+  const { session, error: signInError } = await signInWithRetry(client, email, TEST_PASSWORD);
+  if (signInError || !session) {
     throw new Error(`Failed to sign in test user: ${signInError?.message}`);
   }
 
