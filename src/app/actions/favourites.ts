@@ -94,3 +94,45 @@ export async function getFavouritedPlants(): Promise<QuizPlant[]> {
   if (!user) return [];
   return getFavouritedPlantsCore(supabase, user.id);
 }
+
+// why get-or-create rather than provisioning this at signup: quiz_attempts
+// needs a real theme_id to reference (it's a required FK), but not every
+// user will ever use "Quiz me on my Favourites" — creating it lazily, on
+// first use, avoids a theme row for users who never touch the feature. The
+// partial unique index on (owner_id) where is_favourites makes the insert
+// safe under a race (two concurrent first-uses) — the loser's insert just
+// fails and re-reads the winner's row.
+export async function getOrCreateFavouritesThemeCore(supabase: SupabaseClient, userId: string): Promise<string> {
+  const { data: existing } = await supabase
+    .from("quiz_themes")
+    .select("id")
+    .eq("owner_id", userId)
+    .eq("is_favourites", true)
+    .maybeSingle();
+  if (existing) return existing.id;
+
+  const { data: created, error } = await supabase
+    .from("quiz_themes")
+    .insert({ display_name: "My Favourites", prompt: "", owner_id: userId, is_global: false, is_favourites: true })
+    .select("id")
+    .single();
+  if (!error) return created.id;
+
+  const { data: afterRace } = await supabase
+    .from("quiz_themes")
+    .select("id")
+    .eq("owner_id", userId)
+    .eq("is_favourites", true)
+    .single();
+  if (afterRace) return afterRace.id;
+  throw error;
+}
+
+export async function getOrCreateFavouritesTheme(): Promise<string> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not signed in");
+  return getOrCreateFavouritesThemeCore(supabase, user.id);
+}

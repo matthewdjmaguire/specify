@@ -46,7 +46,13 @@ export async function searchAllCore(supabase: SupabaseClient, query: string): Pr
   if (term.length < 2) return EMPTY;
 
   const [{ data: themeRows }, plants] = await Promise.all([
-    supabase.from("quiz_themes").select("id, display_name").ilike("display_name", `%${term}%`).order("display_name").limit(RESULT_LIMIT),
+    supabase
+      .from("quiz_themes")
+      .select("id, display_name")
+      .eq("is_favourites", false)
+      .ilike("display_name", `%${term}%`)
+      .order("display_name")
+      .limit(RESULT_LIMIT),
     searchPlants(supabase, term),
   ]);
 

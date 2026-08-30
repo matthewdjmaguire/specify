@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getResumableAttempts } from "@/app/actions/quiz-attempts";
 import { StartQuizForm } from "./start-quiz-form";
 
 export default async function QuizThemePage({ params }: { params: Promise<{ themeId: string }> }) {
@@ -10,11 +11,12 @@ export default async function QuizThemePage({ params }: { params: Promise<{ them
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [{ data: theme }, { data: profile }] = await Promise.all([
+  const [{ data: theme }, { data: profile }, resumableAttempts] = await Promise.all([
     supabase.from("quiz_themes").select("id, display_name, is_lucky_dip").eq("id", themeId).single(),
     user
       ? supabase.from("profiles").select("geo_scope, quiz_length").eq("id", user.id).single()
       : Promise.resolve({ data: null }),
+    getResumableAttempts(themeId),
   ]);
 
   if (!theme) notFound();
@@ -30,7 +32,12 @@ export default async function QuizThemePage({ params }: { params: Promise<{ them
           {questionCount} questions · {geoScope} plants
         </p>
       </div>
-      <StartQuizForm themeId={theme.id} geoScope={geoScope} questionCount={questionCount} />
+      <StartQuizForm
+        themeId={theme.id}
+        geoScope={geoScope}
+        questionCount={questionCount}
+        resumableAttempts={resumableAttempts}
+      />
     </div>
   );
 }

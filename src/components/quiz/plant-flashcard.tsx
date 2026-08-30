@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { FavouriteButton } from "./favourite-button";
@@ -24,9 +27,19 @@ export function PlantFlashcard({
   // corner button.
   isFavourite?: boolean;
 }) {
+  // why collapsed by default rather than always showing full details: per
+  // direct feedback, the full field grid + description pushed the Next
+  // button off an iPhone-height screen once a follow-up question's own
+  // options were added below it. The caller resets this by keying the
+  // component on plant.id — switching plants should default back to
+  // collapsed, but moving between two questions *for the same plant* (the
+  // ID question and its follow-up) shouldn't re-collapse an already-opened
+  // card.
+  const [detailsOpen, setDetailsOpen] = useState(false);
+
   return (
     <Card className="w-full max-w-md overflow-hidden gap-0 py-0">
-      <div className="relative aspect-4/3 w-full bg-muted">
+      <div className="relative aspect-video w-full bg-muted">
         {plant.imageUrl ? (
           // why unoptimized: this renders the RHS image URL directly with no
           // Vercel image-optimization proxying/caching — a genuine hotlink,
@@ -46,13 +59,24 @@ export function PlantFlashcard({
         )}
       </div>
       {revealLevel !== "hidden" && (
-        <CardContent className="flex flex-col gap-3 py-4">
+        <CardContent className="flex flex-col gap-2 py-3">
           <div>
             <p className="text-lg font-semibold italic">{plant.scientificName}</p>
             {plant.commonName && <p className="text-sm text-muted-foreground">{plant.commonName}</p>}
           </div>
 
-          {revealLevel === "full" && <PlantDetails plant={plant} />}
+          {revealLevel === "full" && (
+            <>
+              <button
+                type="button"
+                onClick={() => setDetailsOpen((v) => !v)}
+                className="text-left text-xs text-primary underline-offset-2 hover:underline"
+              >
+                {detailsOpen ? "Hide details" : "Show details"}
+              </button>
+              {detailsOpen && <PlantDetails plant={plant} />}
+            </>
+          )}
         </CardContent>
       )}
     </Card>

@@ -19,7 +19,7 @@ export function IntermediateQuestion({
 
   return (
     <div className="flex w-full max-w-md flex-col gap-4">
-      <div className="flex flex-col gap-2">
+      <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
         {options.map((option) => {
           const isCorrect = option.id === correctPlantId;
           const isSelected = option.id === answeredId;
@@ -30,7 +30,7 @@ export function IntermediateQuestion({
               data-testid="answer-option"
               onClick={() => onSelect(option)}
               disabled={showFeedback}
-              className={`rounded-lg border p-3 text-left italic transition-colors disabled:cursor-default ${
+              className={`rounded-lg border px-3 py-2 text-left text-sm italic transition-colors disabled:cursor-default ${
                 showFeedback && isCorrect
                   ? "border-success bg-success/10"
                   : showFeedback && isSelected

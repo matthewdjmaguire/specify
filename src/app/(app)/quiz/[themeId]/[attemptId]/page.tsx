@@ -55,6 +55,14 @@ export default async function QuizAttemptPage({
     plant: toQuizPlant(q.plants),
   }));
 
+  // why the first unanswered question, not always 0: resuming an
+  // in-progress attempt (see start-quiz-form.tsx's "Resume quiz") should
+  // pick up where it was left, not restart from the beginning. Falls back
+  // to the last question if every question already has an answer (e.g. the
+  // attempt just hasn't been explicitly finished yet).
+  const firstUnansweredIndex = items.findIndex((q) => q.status === "unanswered");
+  const initialIndex = firstUnansweredIndex === -1 ? Math.max(items.length - 1, 0) : firstUnansweredIndex;
+
   return (
     <QuizRunner
       attemptId={attempt.id}
@@ -63,6 +71,7 @@ export default async function QuizAttemptPage({
       questions={items}
       catalogue={catalogue}
       favouritePlantIds={favouritePlantIds}
+      initialIndex={initialIndex}
     />
   );
 }

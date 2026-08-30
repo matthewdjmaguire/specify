@@ -15,6 +15,10 @@ export default async function SettingsQuizzesPage() {
     .from("quiz_themes")
     .select("id, display_name, prompt")
     .eq("owner_id", user.id)
+    // why excluded: the auto-created "My Favourites" theme isn't
+    // user-manageable here — deleting it here would cascade-delete every
+    // quiz_attempt run via /favourites' "Quiz me on my Favourites" button.
+    .eq("is_favourites", false)
     .order("display_name");
 
   return (

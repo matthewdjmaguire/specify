@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { resolveThemePlants } from "@/lib/quiz/resolve-theme-plants";
 import { selectQuizPlants } from "@/lib/quiz/select-plants";
 import { selectFollowupCategories } from "@/lib/quiz/followup-questions";
+import { getFavouritePlantIdsCore } from "./favourites";
 import type { QuizPlant } from "@/lib/quiz/types";
 
 export type StartQuizInput = {
@@ -26,18 +27,36 @@ export async function startQuizAttemptCore(
 ): Promise<string> {
   const { data: theme, error: themeError } = await supabase
     .from("quiz_themes")
-    .select("prompt, is_lucky_dip")
+    .select("prompt, is_lucky_dip, is_favourites")
     .eq("id", input.themeId)
     .single();
   if (themeError || !theme) throw new Error("Quiz theme not found");
 
-  const plants = await resolveThemePlants(
-    supabase,
-    { prompt: theme.prompt, isLuckyDip: theme.is_lucky_dip },
-    input.geoScope,
-  );
-  if (plants.length === 0) {
-    throw new Error("No plants match this quiz theme for the selected geographic scope");
+  // why favourites is resolved separately, not folded into
+  // resolveThemePlants: it isn't a prompt-filter at all — it's a per-user
+  // set from plant_stats, which resolveThemePlants has no concept of (and
+  // shouldn't need to, for every other theme that doesn't care about it).
+  let plants: QuizPlant[];
+  if (theme.is_favourites) {
+    const favouritePlantIds = new Set(await getFavouritePlantIdsCore(supabase, userId));
+    const catalogue = await resolveThemePlants(supabase, { prompt: "", isLuckyDip: true }, input.geoScope);
+    plants = catalogue.filter((p) => favouritePlantIds.has(p.id));
+    if (plants.length === 0) {
+      throw new Error(
+        favouritePlantIds.size === 0
+          ? "You haven't favourited any plants yet."
+          : "None of your favourited plants match the selected geographic scope.",
+      );
+    }
+  } else {
+    plants = await resolveThemePlants(
+      supabase,
+      { prompt: theme.prompt, isLuckyDip: theme.is_lucky_dip },
+      input.geoScope,
+    );
+    if (plants.length === 0) {
+      throw new Error("No plants match this quiz theme for the selected geographic scope");
+    }
   }
 
   const { data: statsRows } = await supabase
@@ -119,6 +138,48 @@ export async function startQuizAttempt(input: StartQuizInput): Promise<string> {
   if (!user) throw new Error("Not signed in");
 
   return startQuizAttemptCore(supabase, user.id, input);
+}
+
+// why only the single most recent incomplete attempt, not a full history:
+// per the request this covers — someone got distracted mid-quiz — an older
+// abandoned attempt for the same theme+mode is superseded, not something
+// to resurface. Older incomplete attempts are simply left alone (not
+// deleted); nothing currently queries them once a newer one exists.
+export async function getResumableAttemptCore(
+  supabase: SupabaseClient,
+  userId: string,
+  themeId: string,
+  mode: StartQuizInput["mode"],
+): Promise<string | null> {
+  const { data } = await supabase
+    .from("quiz_attempts")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("theme_id", themeId)
+    .eq("mode", mode)
+    .is("completed_at", null)
+    .order("started_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return data?.id ?? null;
+}
+
+export async function getResumableAttempts(
+  themeId: string,
+): Promise<Partial<Record<StartQuizInput["mode"], string>>> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return {};
+
+  const modes: StartQuizInput["mode"][] = ["learning", "intermediate", "hard"];
+  const entries = await Promise.all(
+    modes.map(async (mode) => [mode, await getResumableAttemptCore(supabase, user.id, themeId, mode)] as const),
+  );
+  return Object.fromEntries(entries.filter(([, attemptId]) => attemptId !== null)) as Partial<
+    Record<StartQuizInput["mode"], string>
+  >;
 }
 
 export async function completeQuizAttemptCore(supabase: SupabaseClient, attemptId: string): Promise<void> {

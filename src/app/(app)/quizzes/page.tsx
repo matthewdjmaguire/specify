@@ -13,6 +13,10 @@ export default async function QuizzesPage() {
     supabase
       .from("quiz_themes")
       .select("id, display_name, prompt, is_lucky_dip")
+      // why excluded: "My Favourites" has its own dedicated entry point
+      // (the "Quiz me on my Favourites" button on /favourites), not a card
+      // here alongside browsable themes.
+      .eq("is_favourites", false)
       .order("is_lucky_dip", { ascending: false })
       .order("display_name"),
     // why fetched once, not once per theme: the thumbnail/count for every

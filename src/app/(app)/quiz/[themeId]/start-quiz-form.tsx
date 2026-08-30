@@ -15,20 +15,31 @@ export function StartQuizForm({
   themeId,
   geoScope,
   questionCount,
+  resumableAttempts,
 }: {
   themeId: string;
   geoScope: "UK" | "Global";
   questionCount: number;
+  // why keyed by mode, not a single id: which mode is "resumable" depends on
+  // which one the user picks below — only the most recent incomplete
+  // attempt per mode matters (see getResumableAttemptCore).
+  resumableAttempts: Partial<Record<StartQuizInput["mode"], string>>;
 }) {
   const [mode, setMode] = useState<StartQuizInput["mode"]>("learning");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  function handleStart() {
+  const resumableAttemptId = resumableAttempts[mode];
+
+  function handleStart(forceNew: boolean) {
     setError(null);
     startTransition(async () => {
       try {
+        if (resumableAttemptId && !forceNew) {
+          router.push(`/quiz/${themeId}/${resumableAttemptId}`);
+          return;
+        }
         const attemptId = await startQuizAttempt({ themeId, mode, geoScope, questionCount });
         router.push(`/quiz/${themeId}/${attemptId}`);
       } catch (err) {
@@ -55,10 +66,25 @@ export function StartQuizForm({
           </button>
         ))}
       </div>
+      {resumableAttemptId && (
+        <p className="text-xs text-muted-foreground">You have an unfinished {mode} attempt for this quiz.</p>
+      )}
       {error && <p className="text-sm text-destructive">{error}</p>}
-      <Button data-testid="start-quiz" onClick={handleStart} disabled={isPending} size="lg">
-        {isPending ? "Starting…" : "Start quiz"}
-      </Button>
+      <div className="flex flex-col items-center gap-2">
+        <Button data-testid="start-quiz" onClick={() => handleStart(false)} disabled={isPending} size="lg">
+          {isPending ? "Starting…" : resumableAttemptId ? "Resume quiz" : "Start quiz"}
+        </Button>
+        {resumableAttemptId && (
+          <button
+            type="button"
+            onClick={() => handleStart(true)}
+            disabled={isPending}
+            className="text-xs text-muted-foreground underline-offset-2 hover:underline"
+          >
+            Start a new attempt instead
+          </button>
+        )}
+      </div>
     </div>
   );
 }

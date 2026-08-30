@@ -29,6 +29,9 @@ export async function getNavData(): Promise<{ profile: NavProfile | null; themes
     supabase
       .from("quiz_themes")
       .select("id, display_name, is_lucky_dip")
+      // why excluded: "My Favourites" isn't a browsable theme in the nav —
+      // reached only via its own button on /favourites.
+      .eq("is_favourites", false)
       .order("is_lucky_dip", { ascending: false })
       .order("display_name"),
   ]);

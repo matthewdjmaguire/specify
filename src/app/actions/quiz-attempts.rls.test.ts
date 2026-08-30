@@ -1,6 +1,7 @@
 import { afterAll, describe, expect, it } from "vitest";
 import { cleanupAllTestUsers, deleteTestUser, createTestUser, type TestUser } from "@/test/rls-test-helpers";
-import { startQuizAttemptCore, completeQuizAttemptCore } from "./quiz-attempts";
+import { startQuizAttemptCore, completeQuizAttemptCore, getResumableAttemptCore } from "./quiz-attempts";
+import { toggleFavouriteCore, getOrCreateFavouritesThemeCore } from "./favourites";
 
 const createdUsers: TestUser[] = [];
 
@@ -159,6 +160,102 @@ describe("starting a quiz attempt (against the live schema)", () => {
       .select("question_type")
       .eq("attempt_id", attemptId);
     expect(questions!.every((q) => q.question_type === "name")).toBe(true);
+  });
+});
+
+describe("starting a quiz on the favourites theme", () => {
+  it("draws only from the user's favourited plants, not the whole catalogue", async () => {
+    const user = await newTestUser("startquiz-fav");
+    const { data: plants } = await user.client
+      .from("plants")
+      .select("id")
+      .contains("geo_tags", ["Global"])
+      .limit(2);
+    // why a service-role fallback if the geo-tagged query comes up short:
+    // this only needs *some* two real plant ids to favourite — which two
+    // doesn't matter, so fall back to any two rows if the live catalogue's
+    // Global-tagged set happens to be smaller than expected.
+    const twoPlantIds =
+      (plants ?? []).length >= 2
+        ? plants!.slice(0, 2).map((p) => p.id)
+        : (await user.client.from("plants").select("id").limit(2)).data!.map((p) => p.id);
+
+    await toggleFavouriteCore(user.client, user.userId, twoPlantIds[0], true);
+    await toggleFavouriteCore(user.client, user.userId, twoPlantIds[1], true);
+
+    const favThemeId = await getOrCreateFavouritesThemeCore(user.client, user.userId);
+    const attemptId = await startQuizAttemptAs(user, {
+      themeId: favThemeId,
+      mode: "learning",
+      geoScope: "Global",
+      questionCount: 20,
+    });
+
+    const { data: questions } = await user.client
+      .from("quiz_questions")
+      .select("plant_id")
+      .eq("attempt_id", attemptId)
+      .eq("question_type", "name");
+    const questionedPlantIds = new Set(questions!.map((q) => q.plant_id));
+    expect(questionedPlantIds.size).toBe(2);
+    for (const id of questionedPlantIds) {
+      expect(twoPlantIds).toContain(id);
+    }
+  });
+
+  it("fails with a clear error when the user has no favourites yet", async () => {
+    const user = await newTestUser("startquiz-fav-empty");
+    const favThemeId = await getOrCreateFavouritesThemeCore(user.client, user.userId);
+
+    await expect(
+      startQuizAttemptAs(user, { themeId: favThemeId, mode: "learning", geoScope: "Global", questionCount: 20 }),
+    ).rejects.toThrow("haven't favourited");
+  });
+});
+
+describe("getResumableAttemptCore", () => {
+  it("finds the most recent incomplete attempt for a theme+mode, ignoring completed ones", async () => {
+    const user = await newTestUser("resume-basic");
+    const { data: theme } = await user.client
+      .from("quiz_themes")
+      .insert({ display_name: "Acer resume", prompt: "acer", owner_id: user.userId, is_global: false })
+      .select("id")
+      .single();
+
+    expect(await getResumableAttemptCore(user.client, user.userId, theme!.id, "intermediate")).toBeNull();
+
+    const attemptId = await startQuizAttemptAs(user, {
+      themeId: theme!.id,
+      mode: "intermediate",
+      geoScope: "Global",
+      questionCount: 2,
+    });
+    expect(await getResumableAttemptCore(user.client, user.userId, theme!.id, "intermediate")).toBe(attemptId);
+
+    // a different mode on the same theme is a different resumable slot
+    expect(await getResumableAttemptCore(user.client, user.userId, theme!.id, "hard")).toBeNull();
+
+    await completeQuizAttemptCore(user.client, attemptId);
+    expect(await getResumableAttemptCore(user.client, user.userId, theme!.id, "intermediate")).toBeNull();
+  });
+
+  it("returns only the most recent of several incomplete attempts for the same theme+mode", async () => {
+    const user = await newTestUser("resume-latest");
+    const { data: theme } = await user.client
+      .from("quiz_themes")
+      .insert({ display_name: "Acer resume 2", prompt: "acer", owner_id: user.userId, is_global: false })
+      .select("id")
+      .single();
+
+    await startQuizAttemptAs(user, { themeId: theme!.id, mode: "hard", geoScope: "Global", questionCount: 2 });
+    const secondAttemptId = await startQuizAttemptAs(user, {
+      themeId: theme!.id,
+      mode: "hard",
+      geoScope: "Global",
+      questionCount: 2,
+    });
+
+    expect(await getResumableAttemptCore(user.client, user.userId, theme!.id, "hard")).toBe(secondAttemptId);
   });
 });
 

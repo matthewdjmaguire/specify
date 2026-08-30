@@ -6,7 +6,12 @@ import {
   deleteTestUser,
   type TestUser,
 } from "@/test/rls-test-helpers";
-import { getFavouritePlantIdsCore, getFavouritedPlantsCore, toggleFavouriteCore } from "./favourites";
+import {
+  getFavouritePlantIdsCore,
+  getFavouritedPlantsCore,
+  getOrCreateFavouritesThemeCore,
+  toggleFavouriteCore,
+} from "./favourites";
 import { recordPlantMasteryCore } from "./plant-stats";
 
 const createdUsers: TestUser[] = [];
@@ -93,6 +98,39 @@ describe("toggleFavouriteCore (against the live schema)", () => {
     const idsB = await getFavouritePlantIdsCore(userB.client, userB.userId);
     expect(idsA).toEqual([plantA]);
     expect(idsB).toEqual([]);
+  });
+});
+
+describe("getOrCreateFavouritesThemeCore", () => {
+  it("creates a personal 'My Favourites' theme on first call, then returns the same id on later calls", async () => {
+    const user = await createTestUser("fav-theme");
+    createdUsers.push(user);
+
+    const firstId = await getOrCreateFavouritesThemeCore(user.client, user.userId);
+    const secondId = await getOrCreateFavouritesThemeCore(user.client, user.userId);
+    expect(secondId).toBe(firstId);
+
+    const { data: theme } = await user.client
+      .from("quiz_themes")
+      .select("display_name, owner_id, is_global, is_favourites")
+      .eq("id", firstId)
+      .single();
+    expect(theme).toMatchObject({
+      display_name: "My Favourites",
+      owner_id: user.userId,
+      is_global: false,
+      is_favourites: true,
+    });
+  });
+
+  it("is scoped per-user — two users each get their own favourites theme", async () => {
+    const userA = await createTestUser("fav-theme-a");
+    const userB = await createTestUser("fav-theme-b");
+    createdUsers.push(userA, userB);
+
+    const themeA = await getOrCreateFavouritesThemeCore(userA.client, userA.userId);
+    const themeB = await getOrCreateFavouritesThemeCore(userB.client, userB.userId);
+    expect(themeA).not.toBe(themeB);
   });
 });
 

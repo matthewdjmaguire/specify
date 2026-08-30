@@ -10,6 +10,7 @@ import { IntermediateQuestion } from "@/components/quiz/intermediate-question";
 import { HardQuestion } from "@/components/quiz/hard-question";
 import { CharacteristicQuestion } from "@/components/quiz/characteristic-question";
 import { QuizProgressRail } from "@/components/quiz/progress-rail";
+import { AnswerFeedbackFlash } from "@/components/quiz/answer-feedback-flash";
 import { selectDistractors } from "@/lib/quiz/select-distractors";
 import { isCloseEnough } from "@/lib/quiz/fuzzy-match";
 import { buildFollowupQuestion, type FollowupCategory } from "@/lib/quiz/followup-questions";
@@ -35,6 +36,7 @@ export function QuizRunner({
   questions: initialQuestions,
   catalogue,
   favouritePlantIds,
+  initialIndex = 0,
 }: {
   attemptId: string;
   themeId: string;
@@ -48,19 +50,34 @@ export function QuizRunner({
   }>;
   catalogue: QuizPlant[];
   favouritePlantIds: string[];
+  initialIndex?: number;
 }) {
   const router = useRouter();
   const [isFinishing, startFinishing] = useTransition();
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(initialIndex);
   const [questions, setQuestions] = useState<QuestionState[]>(() =>
     initialQuestions.map((q) => ({ ...q, userAnswer: null })),
   );
   const [favouriteIds] = useState(() => new Set(favouritePlantIds));
+  // why keyed by questionId, not a plain boolean: prevents the flash from
+  // re-triggering when navigating back to an already-answered question —
+  // it should only fire the instant an answer is actually recorded.
+  const [justAnswered, setJustAnswered] = useState<{ questionId: string; correct: boolean } | null>(null);
   const current = questions[index];
   const isFollowup = current?.questionType.startsWith("characteristic:") ?? false;
   const followupCategory = isFollowup
     ? (current.questionType.split(":")[1] as FollowupCategory)
     : null;
+
+  // why a wrapper around setIndex, not a useEffect keyed on index: an
+  // effect that clears justAnswered on every index change works, but
+  // triggers React's "avoid setState directly in an effect" lint rule —
+  // clearing it at the same call site that changes the index is equivalent
+  // and doesn't need an effect at all.
+  function goToIndex(next: number) {
+    setJustAnswered(null);
+    setIndex(next);
+  }
 
   // why grouped by plant, not just looking at `current`: the two-stage
   // reveal (name only after the ID question, full card only after the
@@ -111,6 +128,7 @@ export function QuizRunner({
     setQuestions((prev) =>
       prev.map((q) => (q.questionId === current.questionId ? { ...q, status, userAnswer: value } : q)),
     );
+    setJustAnswered({ questionId: current.questionId, correct: isCorrect });
     // why plant_stats only updates for the name question, not follow-ups:
     // priority_weight (SPEC-010's selection input) is about "recognise this
     // plant by name" specifically — see plant-stats.ts's own comment.
@@ -144,29 +162,37 @@ export function QuizRunner({
   }
 
   return (
-    <div className="flex flex-1 flex-col items-center gap-6 p-8">
-      <div className="flex w-full max-w-2xl items-center justify-end">
-        {/* why render, not asChild: this shadcn install is Base UI, not
-            Radix — see CLAUDE.md's Learnings. */}
-        <Button
-          variant="ghost"
-          size="sm"
-          render={
-            <Link href={`/quiz/${themeId}`}>
-              <X className="size-4" />
-              Exit
-            </Link>
-          }
-        />
-      </div>
+    <div className="relative flex flex-1 flex-col items-center gap-3 p-4">
+      {/* why absolutely positioned rather than its own row: a fixed-height
+          question needs to fit an iPhone 15 screen without scrolling — a
+          full-width row just for Exit was one row too many. */}
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        className="absolute top-2 right-2 z-10"
+        aria-label="Exit quiz"
+        render={
+          <Link href={`/quiz/${themeId}`}>
+            <X className="size-4" />
+          </Link>
+        }
+      />
 
       <QuizProgressRail
         items={questions.map((q) => ({ status: q.status }))}
         currentIndex={index}
-        onJump={setIndex}
+        onJump={goToIndex}
       />
 
-      <PlantFlashcard plant={current.plant} revealLevel={revealLevel} isFavourite={favouriteIds.has(current.plant.id)} />
+      <div className="relative w-full max-w-md">
+        <PlantFlashcard
+          key={current.plant.id}
+          plant={current.plant}
+          revealLevel={revealLevel}
+          isFavourite={favouriteIds.has(current.plant.id)}
+        />
+        {justAnswered?.questionId === current.questionId && <AnswerFeedbackFlash isCorrect={justAnswered.correct} />}
+      </div>
 
       {isFollowup && followupQuestion && (
         <CharacteristicQuestion
@@ -199,7 +225,7 @@ export function QuizRunner({
         <Button
           variant="outline"
           data-testid="quiz-back"
-          onClick={() => setIndex((i) => Math.max(0, i - 1))}
+          onClick={() => goToIndex(Math.max(0, index - 1))}
           disabled={index === 0}
         >
           Back
@@ -209,7 +235,7 @@ export function QuizRunner({
             {isFinishing ? "Finishing…" : "Finish"}
           </Button>
         ) : (
-          <Button data-testid="quiz-next" onClick={() => setIndex((i) => Math.min(questions.length - 1, i + 1))}>
+          <Button data-testid="quiz-next" onClick={() => goToIndex(Math.min(questions.length - 1, index + 1))}>
             Next
           </Button>
         )}
