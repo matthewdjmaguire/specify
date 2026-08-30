@@ -7,12 +7,15 @@ import { Check, X } from "lucide-react";
 // tw-animate-css's animate-out utilities (already a dependency) drive the
 // actual "wipe upward and disappear" motion; fill-mode-forwards keeps it
 // invisible at rest instead of snapping back after the animation ends.
+// why delay-1000: animate-out starts wiping the instant this mounts —
+// without a delay the icon was gone before it registered as "shown".
+// Holding for 1s first, then playing the same 700ms wipe, is the fix.
 export function AnswerFeedbackFlash({ isCorrect }: { isCorrect: boolean }) {
   const Icon = isCorrect ? Check : X;
   return (
     <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center overflow-hidden rounded-lg">
       <div
-        className={`animate-out fade-out slide-out-to-top-12 duration-700 ease-out fill-mode-forwards rounded-full p-6 ${
+        className={`animate-out fade-out slide-out-to-top-12 duration-700 delay-1000 ease-out fill-mode-forwards rounded-full p-6 ${
           isCorrect ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"
         }`}
       >
