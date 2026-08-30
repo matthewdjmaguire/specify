@@ -14,6 +14,17 @@ const createdUsers: TestUser[] = [];
 // cleanup cascade doesn't reach them (see CLAUDE.md's Learnings on shared/
 // global-table test leakage).
 const createdGlobalThemeIds: string[] = [];
+// why attempts are tracked and deleted separately, before the themes: the
+// "blocked" test below deliberately leaves a real quiz_attempts row
+// referencing its theme (that's the whole point — proving the delete is
+// blocked). quiz_themes.theme_id is ON DELETE RESTRICT (2026-08-30 security
+// fix), so deleting the theme in afterAll while that attempt still exists
+// would fail with the exact same 23503 the test asserts — and supabase-js
+// doesn't throw on that, it returns `{ error }`, so a swallowed
+// `try { await query } catch {}` around the theme delete would silently
+// leak the theme on every run. Eight copies of this exact leak had already
+// accumulated by the time this comment was written.
+const createdAttemptIds: string[] = [];
 
 async function newTestUser(label: string): Promise<TestUser> {
   const user = await createTestUser(label);
@@ -29,10 +40,13 @@ async function promoteToAdmin(userId: string): Promise<void> {
 
 afterAll(async () => {
   const admin = createServiceRoleClient();
-  try {
-    await admin.from("quiz_themes").delete().in("id", createdGlobalThemeIds);
-  } catch {
-    // best-effort cleanup
+  if (createdAttemptIds.length > 0) {
+    const { error } = await admin.from("quiz_attempts").delete().in("id", createdAttemptIds);
+    if (error) console.error("Failed to clean up test quiz_attempts:", error);
+  }
+  if (createdGlobalThemeIds.length > 0) {
+    const { error } = await admin.from("quiz_themes").delete().in("id", createdGlobalThemeIds);
+    if (error) console.error("Failed to clean up test quiz_themes:", error);
   }
   for (const user of createdUsers) {
     await deleteTestUser(user.userId).catch(() => {});
@@ -66,6 +80,7 @@ describe("deleting a global quiz theme (against the live schema)", () => {
       geoScope: "Global",
       questionCount: 1,
     });
+    createdAttemptIds.push(attemptId);
 
     const { error: deleteError } = await admin.client.from("quiz_themes").delete().eq("id", theme.id);
     expect(deleteError).not.toBeNull();
