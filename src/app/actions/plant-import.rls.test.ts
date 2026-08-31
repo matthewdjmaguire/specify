@@ -1,5 +1,6 @@
 import { afterAll, describe, expect, it } from "vitest";
-import { createImportJobCore, getImportJobsCore } from "./plant-import";
+import { createBulkImportJobsCore, createImportJobCore, getImportJobsCore } from "./plant-import";
+import { allGenera } from "../../../scripts/lib/genus-list";
 import {
   cleanupAllTestUsers,
   createServiceRoleClient,
@@ -28,6 +29,18 @@ afterAll(async () => {
   for (const id of createdJobIds) {
     try {
       await admin.from("plant_import_jobs").delete().eq("id", id);
+    } catch {
+      // best-effort cleanup
+    }
+  }
+  // why also swept by requested_by, not just createdJobIds: bulk-created
+  // jobs' ids aren't known ahead of time (which genera get queued depends
+  // on the live catalogue's current counts) — sweeping every job this
+  // test's admin users requested covers those regardless.
+  const testUserIds = createdUsers.map((u) => u.userId);
+  if (testUserIds.length > 0) {
+    try {
+      await admin.from("plant_import_jobs").delete().in("requested_by", testUserIds);
     } catch {
       // best-effort cleanup
     }
@@ -74,5 +87,40 @@ describe("createImportJobCore", () => {
     expect(created).toBeDefined();
     expect(created?.status).toBe("pending");
     if (created) createdJobIds.push(created.id);
+  });
+});
+
+describe("createBulkImportJobsCore", () => {
+  it("rejects a non-admin acting user", async () => {
+    const user = await newTestUser("bulkimport-nonadmin");
+    await expect(createBulkImportJobsCore(user.client, user.userId, 1)).rejects.toThrow("Admin access required");
+  });
+
+  it("rejects a target count outside 1-100", async () => {
+    const admin = await newTestUser("bulkimport-admin1");
+    await promoteToAdmin(admin.userId);
+    await expect(createBulkImportJobsCore(admin.client, admin.userId, 0)).rejects.toThrow(/between 1 and 100/);
+    await expect(createBulkImportJobsCore(admin.client, admin.userId, 101)).rejects.toThrow(/between 1 and 100/);
+  });
+
+  it("queues at most one job per curated genus, and skips on a repeat call", async () => {
+    const admin = await newTestUser("bulkimport-admin2");
+    await promoteToAdmin(admin.userId);
+    const totalCuratedGenera = allGenera().length;
+
+    // why target=1: minimizes how many genera actually need a fresh job
+    // against the live catalogue (most curated genera already have at
+    // least a few plants from the original seed) — keeps this test's real
+    // side effects on the shared plant_import_jobs table small.
+    const first = await createBulkImportJobsCore(admin.client, admin.userId, 1);
+    expect(first.queuedCount + first.skippedCount).toBe(totalCuratedGenera);
+
+    // every genus queued by the first call now has a pending job, so a
+    // second call at the same target must skip all of them — proves the
+    // "already has an active job" guard, independent of exact catalogue
+    // counts.
+    const second = await createBulkImportJobsCore(admin.client, admin.userId, 1);
+    expect(second.queuedCount).toBe(0);
+    expect(second.skippedCount).toBe(totalCuratedGenera);
   });
 });

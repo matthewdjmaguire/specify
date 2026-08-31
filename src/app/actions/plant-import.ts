@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { processImportJobTick } from "@/lib/import/process-import-job";
+import { allGenera } from "../../../scripts/lib/genus-list";
 
 export type ImportJob = {
   id: string;
@@ -59,6 +60,77 @@ export async function createImportJob(genus: string, targetCount: number): Promi
 
   await createImportJobCore(supabase, user.id, genus, targetCount);
   revalidatePath("/admin");
+}
+
+// why genera already at/above the target are skipped, not just re-queued
+// unconditionally: this is a "top up", not a "re-run everything" — a genus
+// already well-stocked would just re-upsert (mostly) the same rows it
+// already has, wasting RHS requests for zero real growth. Genera with an
+// existing pending/running job are skipped too, so clicking this twice in a
+// row doesn't double-queue the same work.
+export async function createBulkImportJobsCore(
+  actingClient: SupabaseClient,
+  actingUserId: string,
+  targetCountPerGenus: number,
+): Promise<{ queuedCount: number; skippedCount: number }> {
+  await requireActingAdmin(actingClient, actingUserId);
+
+  if (!Number.isInteger(targetCountPerGenus) || targetCountPerGenus < 1 || targetCountPerGenus > 100) {
+    throw new Error("Target count must be between 1 and 100.");
+  }
+
+  const service = createServiceRoleClient();
+
+  // why counted in JS, not a group-by RPC: the catalogue is small enough
+  // (hundreds, not millions, of rows) that fetching just the genus column
+  // and tallying it here is simpler than adding a new DB function for one
+  // caller.
+  const { data: genusRows, error: countError } = await service.from("plants").select("genus").not("genus", "is", null);
+  if (countError) throw countError;
+  const currentCounts = new Map<string, number>();
+  for (const row of genusRows ?? []) {
+    const key = (row.genus as string).toLowerCase();
+    currentCounts.set(key, (currentCounts.get(key) ?? 0) + 1);
+  }
+
+  const { data: existingJobs, error: jobsError } = await service
+    .from("plant_import_jobs")
+    .select("genus")
+    .in("status", ["pending", "running"]);
+  if (jobsError) throw jobsError;
+  const genusesWithActiveJob = new Set((existingJobs ?? []).map((j) => j.genus));
+
+  let queuedCount = 0;
+  let skippedCount = 0;
+  for (const genus of allGenera()) {
+    const currentCount = currentCounts.get(genus) ?? 0;
+    if (currentCount >= targetCountPerGenus || genusesWithActiveJob.has(genus)) {
+      skippedCount++;
+      continue;
+    }
+    const { error } = await service
+      .from("plant_import_jobs")
+      .insert({ requested_by: actingUserId, genus, target_count: targetCountPerGenus });
+    if (error) throw error;
+    queuedCount++;
+  }
+
+  return { queuedCount, skippedCount };
+}
+
+export async function createBulkImportJobs(targetCountPerGenus: number): Promise<{
+  queuedCount: number;
+  skippedCount: number;
+}> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not signed in");
+
+  const result = await createBulkImportJobsCore(supabase, user.id, targetCountPerGenus);
+  revalidatePath("/admin");
+  return result;
 }
 
 export async function getImportJobsCore(supabase: SupabaseClient): Promise<ImportJob[]> {
