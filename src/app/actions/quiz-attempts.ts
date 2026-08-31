@@ -140,20 +140,29 @@ export async function startQuizAttempt(input: StartQuizInput): Promise<string> {
   return startQuizAttemptCore(supabase, user.id, input);
 }
 
+export type ResumableAttempt = { id: string; geoScope: "UK" | "Global" };
+
 // why only the single most recent incomplete attempt, not a full history:
 // per the request this covers — someone got distracted mid-quiz — an older
 // abandoned attempt for the same theme+mode is superseded, not something
 // to resurface. Older incomplete attempts are simply left alone (not
 // deleted); nothing currently queries them once a newer one exists.
+//
+// why geoScope is returned alongside the id: an attempt's plant list is
+// fixed at creation time (startQuizAttemptCore runs resolveThemePlants
+// once) — resuming an old attempt always shows whatever geo scope it was
+// started with, regardless of the profile's *current* setting. Surfacing
+// that here lets the UI explain why "I just changed to Global but the quiz
+// still looks the same" isn't a bug — see start-quiz-form.tsx.
 export async function getResumableAttemptCore(
   supabase: SupabaseClient,
   userId: string,
   themeId: string,
   mode: StartQuizInput["mode"],
-): Promise<string | null> {
+): Promise<ResumableAttempt | null> {
   const { data } = await supabase
     .from("quiz_attempts")
-    .select("id")
+    .select("id, geo_scope")
     .eq("user_id", userId)
     .eq("theme_id", themeId)
     .eq("mode", mode)
@@ -161,12 +170,12 @@ export async function getResumableAttemptCore(
     .order("started_at", { ascending: false })
     .limit(1)
     .maybeSingle();
-  return data?.id ?? null;
+  return data ? { id: data.id, geoScope: data.geo_scope as "UK" | "Global" } : null;
 }
 
 export async function getResumableAttempts(
   themeId: string,
-): Promise<Partial<Record<StartQuizInput["mode"], string>>> {
+): Promise<Partial<Record<StartQuizInput["mode"], ResumableAttempt>>> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -177,8 +186,8 @@ export async function getResumableAttempts(
   const entries = await Promise.all(
     modes.map(async (mode) => [mode, await getResumableAttemptCore(supabase, user.id, themeId, mode)] as const),
   );
-  return Object.fromEntries(entries.filter(([, attemptId]) => attemptId !== null)) as Partial<
-    Record<StartQuizInput["mode"], string>
+  return Object.fromEntries(entries.filter(([, attempt]) => attempt !== null)) as Partial<
+    Record<StartQuizInput["mode"], ResumableAttempt>
   >;
 }
 

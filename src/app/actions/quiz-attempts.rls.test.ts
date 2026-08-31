@@ -230,7 +230,10 @@ describe("getResumableAttemptCore", () => {
       geoScope: "Global",
       questionCount: 2,
     });
-    expect(await getResumableAttemptCore(user.client, user.userId, theme!.id, "intermediate")).toBe(attemptId);
+    expect(await getResumableAttemptCore(user.client, user.userId, theme!.id, "intermediate")).toMatchObject({
+      id: attemptId,
+      geoScope: "Global",
+    });
 
     // a different mode on the same theme is a different resumable slot
     expect(await getResumableAttemptCore(user.client, user.userId, theme!.id, "hard")).toBeNull();
@@ -255,7 +258,9 @@ describe("getResumableAttemptCore", () => {
       questionCount: 2,
     });
 
-    expect(await getResumableAttemptCore(user.client, user.userId, theme!.id, "hard")).toBe(secondAttemptId);
+    expect(await getResumableAttemptCore(user.client, user.userId, theme!.id, "hard")).toMatchObject({
+      id: secondAttemptId,
+    });
   });
 });
 
