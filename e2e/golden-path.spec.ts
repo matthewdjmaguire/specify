@@ -49,12 +49,23 @@ async function runQuizToCompletion(page: Page, mode: "learning" | "intermediate"
     await page.getByTestId("quiz-next").click();
   }
 
-  await page.waitForURL(/\/summary$/);
-  await expect(page.getByRole("heading", { name: "Quiz complete" })).toBeVisible();
+  if (mode === "learning") {
+    // why no summary: Learning mode never scores anything (it's a flashcard
+    // deck), so Finish goes back to mode-select instead of a "0/0 correct"
+    // summary page — see quiz-runner.tsx's handleFinish.
+    await page.waitForURL(/\/quiz\/[^/]+$/);
+  } else {
+    await page.waitForURL(/\/summary$/);
+    await expect(page.getByRole("heading", { name: "Quiz complete" })).toBeVisible();
+  }
 }
 
 test.describe("golden path", () => {
-  for (const mode of ["learning", "intermediate", "hard"] as const) {
+  test("sign in → run a learning quiz → return to mode-select (no summary)", async ({ page }) => {
+    await runQuizToCompletion(page, "learning");
+  });
+
+  for (const mode of ["intermediate", "hard"] as const) {
     test(`sign in → run a ${mode} quiz → reach the summary`, async ({ page }) => {
       await runQuizToCompletion(page, mode);
     });

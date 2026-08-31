@@ -157,7 +157,11 @@ export function QuizRunner({
   function handleFinish() {
     startFinishing(async () => {
       await completeQuizAttempt(attemptId);
-      router.push(`/quiz/${themeId}/${attemptId}/summary`);
+      // why no summary for Learning mode: nothing is ever answered/scored in
+      // Learning mode (it's a flashcard deck, not a test) — the summary page
+      // would always show "0/0 correct", which isn't useful. Send them back
+      // to mode-select instead.
+      router.push(mode === "learning" ? `/quiz/${themeId}` : `/quiz/${themeId}/${attemptId}/summary`);
     });
   }
 
