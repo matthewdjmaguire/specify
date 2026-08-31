@@ -128,6 +128,17 @@ function splitList(value: string | undefined): string[] {
     .filter(Boolean);
 }
 
+// why: RHS auto-generates this exact boilerplate as the JSON-LD
+// `description` for "thin" cultivar pages that have no real editorial
+// content — every well-documented page has a genuine botanical description
+// in the same field instead, so this is a reliable, cheap way to tell the
+// two apart (found by comparing a sparse Camellia cultivar page against a
+// known well-documented Acer page — both only differ in whether this exact
+// sentence shape is *all* the field contains).
+function isGenericDescription(text: string, scientificName: string): boolean {
+  return text === `Find help & information on ${scientificName} from the RHS`;
+}
+
 export function parsePlantPage(html: string, sourceUrl: string): PlantRecord | null {
   const $ = cheerio.load(html);
   const taxon = extractTaxon($);
@@ -149,11 +160,15 @@ export function parsePlantPage(html: string, sourceUrl: string): PlantRecord | n
     geoTags.push("UK");
   }
 
+  const scientificName = taxon.name.trim();
+  const rawDescription = taxon.description?.trim() || null;
+  const description = rawDescription && !isGenericDescription(rawDescription, scientificName) ? rawDescription : null;
+
   return {
-    scientificName: taxon.name.trim(),
+    scientificName,
     commonName,
     synonyms,
-    description: taxon.description?.trim() || null,
+    description,
     imageUrl: taxon.image || null,
     source: "rhs",
     sourceUrl,

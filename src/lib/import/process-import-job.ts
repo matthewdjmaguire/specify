@@ -91,7 +91,14 @@ export async function processImportJobTick(supabase: SupabaseClient, job: JobRow
       if (!res.ok) continue;
       const html = await res.text();
       const plant = parsePlantPage(html, url);
-      if (!plant) continue;
+      // why skipping plants with no image, not just parsing gracefully:
+      // RHS's own sitemap mixes well-documented plant pages with thin
+      // "database stub" cultivar pages that carry a name and nothing else
+      // (no real description, no photo) — found via a live report that a
+      // 100-plant Camellia import was 87% cards with no image. A record
+      // this bare isn't worth surfacing as a real catalogue entry, so it's
+      // skipped (not counted toward the job's target) rather than imported.
+      if (!plant || !plant.imageUrl) continue;
 
       const { error } = await supabase.from("plants").upsert(toRow(plant), { onConflict: "scientific_name" });
       if (!error) importedCount++;

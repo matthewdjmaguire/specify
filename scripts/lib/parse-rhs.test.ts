@@ -119,4 +119,28 @@ describe("parsePlantPage", () => {
     const record = parsePlantPage(html, "https://example.com/plant");
     expect(record?.geoTags).toEqual(["Global"]);
   });
+
+  // why: RHS auto-generates "Find help & information on {name} from the
+  // RHS" as the JSON-LD description on thin "database stub" cultivar pages
+  // that have no real editorial content or photo — found via a live report
+  // that a 100-plant Camellia import was 87% cards with no image, because
+  // this generic text was being stored (and the record imported) as if it
+  // were real content.
+  it("treats RHS's generic 'Find help & information on...' boilerplate as no description", () => {
+    const html = `
+      <html><head><script type="application/ld+json">
+        {"@graph":[{"@type":"Taxon","name":"Camellia japonica 'Bonesyeboni'","description":"Find help & information on Camellia japonica 'Bonesyeboni' from the RHS"}]}
+      </script></head><body></body></html>`;
+    const record = parsePlantPage(html, "https://example.com/plant");
+    expect(record?.description).toBeNull();
+  });
+
+  it("keeps a real description that happens to also mention the plant's name", () => {
+    const html = `
+      <html><head><script type="application/ld+json">
+        {"@graph":[{"@type":"Taxon","name":"Acer serpentine","description":"A deciduous snakebark maple making a small tree with white-striped purple bark"}]}
+      </script></head><body></body></html>`;
+    const record = parsePlantPage(html, "https://example.com/plant");
+    expect(record?.description).toBe("A deciduous snakebark maple making a small tree with white-striped purple bark");
+  });
 });
