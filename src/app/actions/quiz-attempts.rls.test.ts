@@ -72,8 +72,17 @@ describe("starting a quiz attempt (against the live schema)", () => {
       .select("id")
       .single();
 
-    // The real seed has 5 Acer plants (see SPEC-001's Learnings) — request
-    // far more than that and confirm it doesn't silently over-report.
+    // why the actual live count, not a hardcoded number: the real seed had
+    // 5 Acer plants when this test was written, but admin-triggered catalogue
+    // top-ups (SPEC-027's follow-up work) grow it over time — asserting
+    // against a fixed number breaks the moment more Acer plants get
+    // imported, which isn't a regression, just catalogue growth. Requesting
+    // far more than exist either way is still what proves the cap works.
+    const { count: actualAcerCount } = await user.client
+      .from("plants")
+      .select("id", { count: "exact", head: true })
+      .eq("genus", "Acer");
+
     const attemptId = await startQuizAttemptAs(user, {
       themeId: theme!.id,
       mode: "intermediate",
@@ -86,7 +95,7 @@ describe("starting a quiz attempt (against the live schema)", () => {
       .select("question_count")
       .eq("id", attemptId)
       .single();
-    expect(attempt!.question_count).toBeLessThanOrEqual(5);
+    expect(attempt!.question_count).toBeLessThanOrEqual(actualAcerCount!);
     expect(attempt!.question_count).toBeGreaterThan(0);
   });
 

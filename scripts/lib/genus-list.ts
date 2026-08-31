@@ -27,7 +27,13 @@ export const GENUS_CATEGORIES: Record<string, string[]> = {
     "viburnum",
     "camellia",
     "rhododendron",
-    "hebe",
+    // why "veronica", not "hebe": RHS reclassifies Hebe under the modern
+    // botanical genus Veronica (a real taxonomic revision, not a scraper
+    // quirk) — confirmed live, RHS's sitemaps have zero "hebe-" prefixed
+    // plant pages but plenty of "veronica-" ones, including former Hebe
+    // cultivar names (e.g. "Veronica 'Saraband'"). "hebe" as a genus slug
+    // always failed with zero candidate URLs.
+    "veronica",
     "buxus",
     "philadelphus",
     "forsythia",
