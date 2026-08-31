@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { processImportJobTick } from "@/lib/import/process-import-job";
-import { allGenera } from "../../../scripts/lib/genus-list";
+import { GENUS_CATEGORIES, allGenera } from "../../../scripts/lib/genus-list";
 
 export type ImportJob = {
   id: string;
@@ -129,6 +129,87 @@ export async function createBulkImportJobs(targetCountPerGenus: number): Promise
   if (!user) throw new Error("Not signed in");
 
   const result = await createBulkImportJobsCore(supabase, user.id, targetCountPerGenus);
+  revalidatePath("/admin");
+  return result;
+}
+
+// why per-category, not per-genus like createBulkImportJobsCore: "at least
+// 100 trees" is what a quiz theme like "Trees" actually needs — a category
+// with many genera can hit that total without every individual genus
+// reaching 100 itself, so distributing the shortfall across whichever
+// genera in the category don't already have a job running is a better fit
+// than a flat per-genus target.
+export async function ensureCategoryMinimumsCore(
+  actingClient: SupabaseClient,
+  actingUserId: string,
+  minPerCategory: number,
+): Promise<{ queuedCount: number; skippedCount: number; categoriesNeedingWork: string[] }> {
+  await requireActingAdmin(actingClient, actingUserId);
+
+  if (!Number.isInteger(minPerCategory) || minPerCategory < 1) {
+    throw new Error("Minimum per category must be a positive whole number.");
+  }
+
+  const service = createServiceRoleClient();
+
+  const { data: genusRows, error: countError } = await service.from("plants").select("genus").not("genus", "is", null);
+  if (countError) throw countError;
+  const currentCounts = new Map<string, number>();
+  for (const row of genusRows ?? []) {
+    const key = (row.genus as string).toLowerCase();
+    currentCounts.set(key, (currentCounts.get(key) ?? 0) + 1);
+  }
+
+  const { data: existingJobs, error: jobsError } = await service
+    .from("plant_import_jobs")
+    .select("genus")
+    .in("status", ["pending", "running"]);
+  if (jobsError) throw jobsError;
+  const genusesWithActiveJob = new Set((existingJobs ?? []).map((j) => j.genus));
+
+  let queuedCount = 0;
+  let skippedCount = 0;
+  const categoriesNeedingWork: string[] = [];
+
+  for (const [category, genera] of Object.entries(GENUS_CATEGORIES)) {
+    const categoryTotal = genera.reduce((sum, g) => sum + (currentCounts.get(g) ?? 0), 0);
+    if (categoryTotal >= minPerCategory) continue;
+
+    const shortfall = minPerCategory - categoryTotal;
+    const availableGenera = genera.filter((g) => !genusesWithActiveJob.has(g));
+    skippedCount += genera.length - availableGenera.length;
+    if (availableGenera.length === 0) continue;
+
+    categoriesNeedingWork.push(category);
+    // why capped at 100 per job: matches every other import job's own
+    // limit (createImportJobCore) — a huge shortfall spread over very few
+    // available genera just means more jobs get queued later, not one job
+    // exceeding the per-job cap.
+    const perGenusTarget = Math.max(1, Math.min(100, Math.ceil(shortfall / availableGenera.length)));
+    for (const genus of availableGenera) {
+      const { error } = await service
+        .from("plant_import_jobs")
+        .insert({ requested_by: actingUserId, genus, target_count: perGenusTarget });
+      if (error) throw error;
+      queuedCount++;
+    }
+  }
+
+  return { queuedCount, skippedCount, categoriesNeedingWork };
+}
+
+export async function ensureCategoryMinimums(minPerCategory: number): Promise<{
+  queuedCount: number;
+  skippedCount: number;
+  categoriesNeedingWork: string[];
+}> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not signed in");
+
+  const result = await ensureCategoryMinimumsCore(supabase, user.id, minPerCategory);
   revalidatePath("/admin");
   return result;
 }

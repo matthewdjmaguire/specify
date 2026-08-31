@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
   createBulkImportJobs,
   createImportJob,
+  ensureCategoryMinimums,
   processNextImportJobTick,
   type ImportJob,
 } from "@/app/actions/plant-import";
@@ -59,10 +60,13 @@ export function PlantImportSection({ initialJobs }: { initialJobs: ImportJob[] }
   const [genus, setGenus] = useState("");
   const [targetCount, setTargetCount] = useState(25);
   const [bulkTargetCount, setBulkTargetCount] = useState(10);
+  const [categoryMinimum, setCategoryMinimum] = useState(100);
   const [error, setError] = useState<string | null>(null);
   const [bulkMessage, setBulkMessage] = useState<string | null>(null);
+  const [categoryMessage, setCategoryMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isBulkPending, startBulkTransition] = useTransition();
+  const [isCategoryPending, startCategoryTransition] = useTransition();
 
   const hasActiveJob = initialJobs.some((j) => j.status === "pending" || j.status === "running");
 
@@ -124,6 +128,23 @@ export function PlantImportSection({ initialJobs }: { initialJobs: ImportJob[] }
         router.refresh();
       } catch (err) {
         setBulkMessage(err instanceof Error ? err.message : "Couldn't queue the bulk import.");
+      }
+    });
+  }
+
+  function handleEnsureCategoryMinimums() {
+    setCategoryMessage(null);
+    startCategoryTransition(async () => {
+      try {
+        const { queuedCount, skippedCount, categoriesNeedingWork } = await ensureCategoryMinimums(categoryMinimum);
+        setCategoryMessage(
+          categoriesNeedingWork.length === 0
+            ? `Nothing to do — every category already has at least ${categoryMinimum} plants.`
+            : `${categoriesNeedingWork.join(", ")} need${categoriesNeedingWork.length === 1 ? "s" : ""} more — queued ${queuedCount} genus import job${queuedCount === 1 ? "" : "s"} (${skippedCount} already in progress). This may take a while for categories with a large shortfall — leave this page open.`,
+        );
+        router.refresh();
+      } catch (err) {
+        setCategoryMessage(err instanceof Error ? err.message : "Couldn't queue the category top-up.");
       }
     });
   }
@@ -199,6 +220,26 @@ export function PlantImportSection({ initialJobs }: { initialJobs: ImportJob[] }
         </Button>
       </div>
       {bulkMessage && <p className="text-sm text-muted-foreground">{bulkMessage}</p>}
+
+      <div className="flex flex-wrap items-end gap-2 border-t pt-3">
+        <div className="flex flex-col gap-1">
+          <label htmlFor="categoryMinimum" className="text-xs font-medium">
+            Minimum per category
+          </label>
+          <input
+            id="categoryMinimum"
+            type="number"
+            min={1}
+            value={categoryMinimum}
+            onChange={(e) => setCategoryMinimum(Number(e.target.value))}
+            className="w-24 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          />
+        </div>
+        <Button type="button" variant="outline" onClick={handleEnsureCategoryMinimums} disabled={isCategoryPending}>
+          {isCategoryPending ? "Queuing…" : "Ensure minimum per category"}
+        </Button>
+      </div>
+      {categoryMessage && <p className="text-sm text-muted-foreground">{categoryMessage}</p>}
 
       {initialJobs.length > 0 && (
         <div className="flex flex-col gap-2">
