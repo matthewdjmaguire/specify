@@ -6,23 +6,21 @@ import { FavouriteButton } from "@/components/quiz/favourite-button";
 import { PlantDetails } from "@/components/quiz/plant-details";
 import type { QuizPlant } from "@/lib/quiz/types";
 
-export function FavouritePlantCard({
+export function PlantCard({
   plant,
+  isFavourite,
   showThumbnail,
   expanded,
   onToggleExpand,
-  onUnfavourite,
+  onFavouriteChange,
 }: {
   plant: QuizPlant;
+  isFavourite: boolean;
   showThumbnail: boolean;
   expanded: boolean;
   onToggleExpand: () => void;
-  onUnfavourite: () => void;
+  onFavouriteChange?: (next: boolean) => void;
 }) {
-  function handleFavouriteToggle(next: boolean) {
-    if (!next) onUnfavourite();
-  }
-
   // why role="button" divs, not nested <button>s: each card wraps a
   // FavouriteButton (itself a <button>) inside its own expand/collapse
   // toggle — a <button> inside a <button> is invalid HTML that the browser
@@ -52,7 +50,7 @@ export function FavouritePlantCard({
             </span>
             {plant.commonName && <span className="text-sm text-muted-foreground"> — {plant.commonName}</span>}
           </span>
-          <FavouriteButton plantId={plant.id} initialIsFavourite onToggle={handleFavouriteToggle} />
+          <FavouriteButton plantId={plant.id} initialIsFavourite={isFavourite} onToggle={onFavouriteChange} />
         </div>
         {expanded && (
           <div className="flex flex-col gap-3 pb-4">
@@ -81,8 +79,8 @@ export function FavouritePlantCard({
           )}
           <FavouriteButton
             plantId={plant.id}
-            initialIsFavourite
-            onToggle={handleFavouriteToggle}
+            initialIsFavourite={isFavourite}
+            onToggle={onFavouriteChange}
             className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm hover:bg-background"
           />
         </div>

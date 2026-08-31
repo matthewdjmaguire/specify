@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { FavouritePlantCard } from "./favourite-plant-card";
+import { PlantCard } from "@/components/quiz/plant-card";
 import type { QuizPlant } from "@/lib/quiz/types";
 
 function uniqueSorted(values: Array<string | null>): string[] {
@@ -51,13 +51,14 @@ export function FavouritesView({ plants: initialPlants }: { plants: QuizPlant[] 
     setExpandedIds(new Set());
   }
 
-  function handleUnfavourite(id: string) {
+  function handleFavouriteChange(id: string, next: boolean) {
+    if (next) return;
     setPlants((prev) => prev.filter((p) => p.id !== id));
     setExpandedIds((prev) => {
       if (!prev.has(id)) return prev;
-      const next = new Set(prev);
-      next.delete(id);
-      return next;
+      const copy = new Set(prev);
+      copy.delete(id);
+      return copy;
     });
   }
 
@@ -144,13 +145,14 @@ export function FavouritesView({ plants: initialPlants }: { plants: QuizPlant[] 
       ) : showThumbnails ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredPlants.map((plant) => (
-            <FavouritePlantCard
+            <PlantCard
               key={plant.id}
               plant={plant}
+              isFavourite
               showThumbnail
               expanded={expandedIds.has(plant.id)}
               onToggleExpand={() => toggleExpand(plant.id)}
-              onUnfavourite={() => handleUnfavourite(plant.id)}
+              onFavouriteChange={(next) => handleFavouriteChange(plant.id, next)}
             />
           ))}
         </div>
@@ -158,12 +160,13 @@ export function FavouritesView({ plants: initialPlants }: { plants: QuizPlant[] 
         <div className="rounded-lg border">
           {filteredPlants.map((plant) => (
             <div key={plant.id} className="px-3">
-              <FavouritePlantCard
+              <PlantCard
                 plant={plant}
+                isFavourite
                 showThumbnail={false}
                 expanded={expandedIds.has(plant.id)}
                 onToggleExpand={() => toggleExpand(plant.id)}
-                onUnfavourite={() => handleUnfavourite(plant.id)}
+                onFavouriteChange={(next) => handleFavouriteChange(plant.id, next)}
               />
             </div>
           ))}
