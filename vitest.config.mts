@@ -20,5 +20,13 @@ export default defineConfig({
     // there's more than a couple of *.rls.test.ts files (this is the exact
     // issue Bean Counter v2's RLS suite hit).
     fileParallelism: false,
+    // why 15s, not vitest's 5s default: every *.rls.test.ts file does real
+    // Supabase Auth sign-ins (not mocked) — a single test creating even two
+    // test users sequentially can legitimately take longer than 5s under
+    // any latency/load variance, which isn't a hang, just real network
+    // round-trips. Hit this three separate times this session (once needing
+    // its own even-higher override for a much heavier bulk-DB test) before
+    // raising the suite-wide default instead of patching tests one at a time.
+    testTimeout: 15000,
   },
 });
