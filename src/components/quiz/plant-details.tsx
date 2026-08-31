@@ -16,6 +16,7 @@ export function PlantDetails({ plant }: { plant: QuizPlant }) {
   return (
     <>
       <dl className="grid grid-cols-2 gap-x-4 gap-y-2">
+        {plant.plantTypes.length > 0 && <Field label="Type" value={plant.plantTypes.join(", ")} />}
         {plant.family && <Field label="Family" value={plant.family} />}
         {plant.habit && <Field label="Habit" value={plant.habit} />}
         {plant.hardiness && <Field label="Hardiness" value={plant.hardiness} />}

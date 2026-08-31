@@ -4,19 +4,24 @@ import { useMemo, useState } from "react";
 import { PlantCard } from "@/components/quiz/plant-card";
 import type { QuizPlant } from "@/lib/quiz/types";
 
-function uniqueSorted(values: Array<string | null>): string[] {
-  return [...new Set(values.filter((v): v is string => Boolean(v)))].sort((a, b) => a.localeCompare(b));
+function uniqueSorted(values: string[]): string[] {
+  return [...new Set(values)].sort((a, b) => a.localeCompare(b));
 }
 
 export function FavouritesView({ plants: initialPlants }: { plants: QuizPlant[] }) {
   const [plants, setPlants] = useState(initialPlants);
   const [query, setQuery] = useState("");
-  const [habitFilter, setHabitFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
   const [positionFilter, setPositionFilter] = useState("");
+  // why "" (All), not defaulting to the profile's quiz geo_scope: browsing
+  // favourites is a different job from generating a quiz — someone should
+  // see everything they've favourited by default, then narrow down if they
+  // want to check what's UK-hardy specifically.
+  const [geoFilter, setGeoFilter] = useState<"" | "UK" | "Global">("");
   const [showThumbnails, setShowThumbnails] = useState(true);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
-  const habitOptions = useMemo(() => uniqueSorted(plants.map((p) => p.habit)), [plants]);
+  const typeOptions = useMemo(() => uniqueSorted(plants.flatMap((p) => p.plantTypes)), [plants]);
   const positionOptions = useMemo(() => uniqueSorted(plants.flatMap((p) => p.position)), [plants]);
 
   const filteredPlants = useMemo(() => {
@@ -27,12 +32,13 @@ export function FavouritesView({ plants: initialPlants }: { plants: QuizPlant[] 
           const haystack = `${p.scientificName} ${p.commonName ?? ""}`.toLowerCase();
           if (!haystack.includes(term)) return false;
         }
-        if (habitFilter && p.habit !== habitFilter) return false;
+        if (typeFilter && !p.plantTypes.includes(typeFilter)) return false;
         if (positionFilter && !p.position.includes(positionFilter)) return false;
+        if (geoFilter && !p.geoTags.includes(geoFilter)) return false;
         return true;
       })
       .sort((a, b) => a.scientificName.localeCompare(b.scientificName));
-  }, [plants, query, habitFilter, positionFilter]);
+  }, [plants, query, typeFilter, positionFilter, geoFilter]);
 
   function toggleExpand(id: string) {
     setExpandedIds((prev) => {
@@ -108,17 +114,27 @@ export function FavouritesView({ plants: initialPlants }: { plants: QuizPlant[] 
           aria-label="Search favourites"
           className="flex-1 basis-48 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
         />
-        {habitOptions.length > 0 && (
+        <select
+          value={geoFilter}
+          onChange={(e) => setGeoFilter(e.target.value as "" | "UK" | "Global")}
+          aria-label="Filter by geographic scope"
+          className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <option value="">UK &amp; Global</option>
+          <option value="UK">UK</option>
+          <option value="Global">Global</option>
+        </select>
+        {typeOptions.length > 0 && (
           <select
-            value={habitFilter}
-            onChange={(e) => setHabitFilter(e.target.value)}
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
             aria-label="Filter by plant type"
             className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <option value="">All types</option>
-            {habitOptions.map((h) => (
-              <option key={h} value={h}>
-                {h}
+            {typeOptions.map((t) => (
+              <option key={t} value={t}>
+                {t}
               </option>
             ))}
           </select>

@@ -13,6 +13,7 @@ function plant(id: string): QuizPlant {
     family: null,
     genus: null,
     habit: null,
+    plantTypes: [],
     foliage: null,
     soilTypes: [],
     moisture: null,
@@ -23,6 +24,7 @@ function plant(id: string): QuizPlant {
     hardiness: null,
     heightRange: null,
     spreadRange: null,
+    geoTags: [],
   };
 }
 

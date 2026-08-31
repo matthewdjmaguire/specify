@@ -11,6 +11,7 @@ export type QuizPlant = {
   family: string | null;
   genus: string | null;
   habit: string | null;
+  plantTypes: string[];
   foliage: string | null;
   soilTypes: string[];
   moisture: string | null;
@@ -21,4 +22,5 @@ export type QuizPlant = {
   hardiness: string | null;
   heightRange: string | null;
   spreadRange: string | null;
+  geoTags: Array<"UK" | "Global">;
 };

@@ -23,6 +23,7 @@ describe("parsePlantPage", () => {
     expect(record?.family).toBe("Ericaceae");
     expect(record?.genus).toBe("Enkianthus");
     expect(record?.habit).toBe("Bushy");
+    expect(record?.plantTypes).toEqual(["Shrubs"]);
     expect(record?.foliage).toBe("Deciduous");
     expect(record?.nativeGb).toBe(false);
     expect(record?.soilTypes).toEqual(["Clay", "Loam", "Sand"]);
@@ -56,6 +57,7 @@ describe("parsePlantPage", () => {
     expect(record?.soilTypes.length).toBeGreaterThan(0);
     expect(record?.position.length).toBeGreaterThan(0);
     expect(record?.hardiness).toBe("H6");
+    expect(record?.plantTypes).toEqual(["Trees"]);
     expect(record?.nativeGb).toBe(false);
     // why: not native to GB, but H6 ("hardy in all of UK...") should still earn
     // the UK tag on its own — this is the branch the other geoTags test below
@@ -84,6 +86,7 @@ describe("parsePlantPage", () => {
     expect(record?.moisture).toBeNull();
     expect(record?.position).toEqual([]);
     expect(record?.soilTypes).toEqual([]);
+    expect(record?.plantTypes).toEqual([]);
     expect(record?.geoTags).toEqual(["Global"]);
   });
 

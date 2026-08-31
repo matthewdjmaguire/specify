@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { FavouriteButton } from "@/components/quiz/favourite-button";
 import { PlantDetails } from "@/components/quiz/plant-details";
 import type { QuizPlant } from "@/lib/quiz/types";
@@ -44,11 +45,22 @@ export function PlantCard({
           aria-expanded={expanded}
           className="flex w-full items-center justify-between gap-3 py-2.5 text-left"
         >
-          <span>
-            <span className="text-sm font-medium italic underline-offset-2 hover:underline">
-              {plant.scientificName}
+          <span className="flex flex-col gap-1">
+            <span>
+              <span className="text-sm font-medium italic underline-offset-2 hover:underline">
+                {plant.scientificName}
+              </span>
+              {plant.commonName && <span className="text-sm text-muted-foreground"> — {plant.commonName}</span>}
             </span>
-            {plant.commonName && <span className="text-sm text-muted-foreground"> — {plant.commonName}</span>}
+            {plant.plantTypes.length > 0 && (
+              <span className="flex flex-wrap gap-1">
+                {plant.plantTypes.map((type) => (
+                  <Badge key={type} variant="secondary">
+                    {type}
+                  </Badge>
+                ))}
+              </span>
+            )}
           </span>
           <FavouriteButton plantId={plant.id} initialIsFavourite={isFavourite} onToggle={onFavouriteChange} />
         </div>
@@ -84,9 +96,18 @@ export function PlantCard({
             className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm hover:bg-background"
           />
         </div>
-        <div className="flex flex-col gap-0.5 px-4 py-3">
+        <div className="flex flex-col gap-1 px-4 py-3">
           <p className="text-sm font-medium italic">{plant.scientificName}</p>
           {plant.commonName && <p className="text-xs text-muted-foreground">{plant.commonName}</p>}
+          {plant.plantTypes.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {plant.plantTypes.map((type) => (
+                <Badge key={type} variant="secondary">
+                  {type}
+                </Badge>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       {expanded && (

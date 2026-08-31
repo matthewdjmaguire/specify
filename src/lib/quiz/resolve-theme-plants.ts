@@ -7,7 +7,7 @@ import type { QuizPlant } from "./types";
 // the one source of truth so a new field (like sourceUrl) only needs adding
 // once.
 export const PLANT_COLUMNS =
-  "id, scientific_name, common_name, description, image_url, source_url, family, genus, habit, foliage, soil_types, moisture, ph, position, aspect, exposure, hardiness, height_range, spread_range, geo_tags";
+  "id, scientific_name, common_name, description, image_url, source_url, family, genus, habit, plant_types, foliage, soil_types, moisture, ph, position, aspect, exposure, hardiness, height_range, spread_range, geo_tags";
 
 export type PlantRow = {
   id: string;
@@ -19,6 +19,7 @@ export type PlantRow = {
   family: string | null;
   genus: string | null;
   habit: string | null;
+  plant_types: string[];
   foliage: string | null;
   soil_types: string[];
   moisture: string | null;
@@ -29,6 +30,7 @@ export type PlantRow = {
   hardiness: string | null;
   height_range: string | null;
   spread_range: string | null;
+  geo_tags: Array<"UK" | "Global">;
 };
 
 export function toQuizPlant(row: PlantRow): QuizPlant {
@@ -42,6 +44,7 @@ export function toQuizPlant(row: PlantRow): QuizPlant {
     family: row.family,
     genus: row.genus,
     habit: row.habit,
+    plantTypes: row.plant_types,
     foliage: row.foliage,
     soilTypes: row.soil_types,
     moisture: row.moisture,
@@ -52,6 +55,7 @@ export function toQuizPlant(row: PlantRow): QuizPlant {
     hardiness: row.hardiness,
     heightRange: row.height_range,
     spreadRange: row.spread_range,
+    geoTags: row.geo_tags,
   };
 }
 
@@ -75,6 +79,7 @@ function haystackWords(plant: QuizPlant): string[] {
     plant.family,
     plant.genus,
     plant.habit,
+    ...plant.plantTypes,
     plant.foliage,
     ...plant.soilTypes,
     plant.moisture,

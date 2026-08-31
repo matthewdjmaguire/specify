@@ -16,6 +16,7 @@ function plant(overrides: Partial<QuizPlant> & { id: string }): QuizPlant {
     family: null,
     genus: null,
     habit: null,
+    plantTypes: [],
     foliage: null,
     soilTypes: [],
     moisture: null,
@@ -26,6 +27,7 @@ function plant(overrides: Partial<QuizPlant> & { id: string }): QuizPlant {
     hardiness: null,
     heightRange: null,
     spreadRange: null,
+    geoTags: [],
     ...overrides,
   };
 }

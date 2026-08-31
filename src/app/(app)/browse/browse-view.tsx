@@ -9,6 +9,10 @@ function letterOf(plant: QuizPlant): string {
   return plant.scientificName.charAt(0).toUpperCase();
 }
 
+function uniqueSorted(values: string[]): string[] {
+  return [...new Set(values)].sort((a, b) => a.localeCompare(b));
+}
+
 function LetterSection({
   letter,
   plants,
@@ -94,6 +98,9 @@ export function BrowseView({
   favouritePlantIds: string[];
 }) {
   const [query, setQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
+  const [positionFilter, setPositionFilter] = useState("");
+  const [geoFilter, setGeoFilter] = useState<"" | "UK" | "Global">("");
   const [showThumbnails, setShowThumbnails] = useState(true);
   const [favouriteIds, setFavouriteIds] = useState(() => new Set(favouritePlantIds));
   // why "A" only, not every letter: the ask was specifically "all but A
@@ -102,11 +109,22 @@ export function BrowseView({
   const [expandedLetters, setExpandedLetters] = useState<Set<string>>(() => new Set(["A"]));
   const [expandedPlantIds, setExpandedPlantIds] = useState<Set<string>>(new Set());
 
+  const typeOptions = useMemo(() => uniqueSorted(plants.flatMap((p) => p.plantTypes)), [plants]);
+  const positionOptions = useMemo(() => uniqueSorted(plants.flatMap((p) => p.position)), [plants]);
+
   const filteredPlants = useMemo(() => {
     const term = query.trim().toLowerCase();
-    if (!term) return plants;
-    return plants.filter((p) => `${p.scientificName} ${p.commonName ?? ""}`.toLowerCase().includes(term));
-  }, [plants, query]);
+    return plants.filter((p) => {
+      if (term) {
+        const haystack = `${p.scientificName} ${p.commonName ?? ""}`.toLowerCase();
+        if (!haystack.includes(term)) return false;
+      }
+      if (typeFilter && !p.plantTypes.includes(typeFilter)) return false;
+      if (positionFilter && !p.position.includes(positionFilter)) return false;
+      if (geoFilter && !p.geoTags.includes(geoFilter)) return false;
+      return true;
+    });
+  }, [plants, query, typeFilter, positionFilter, geoFilter]);
 
   const groups = useMemo(() => {
     const map = new Map<string, QuizPlant[]>();
@@ -119,7 +137,10 @@ export function BrowseView({
     return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
   }, [filteredPlants]);
 
-  const isSearching = query.trim().length > 0;
+  // why any active filter, not just text search: a collapsed letter section
+  // would otherwise hide a match for "Trees" or "UK" the same way it would
+  // for a typed search term.
+  const isSearching = query.trim().length > 0 || typeFilter !== "" || positionFilter !== "" || geoFilter !== "";
 
   function toggleLetter(letter: string) {
     setExpandedLetters((prev) => {
@@ -189,17 +210,59 @@ export function BrowseView({
         </label>
       </div>
 
-      <input
-        type="search"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search plants…"
-        aria-label="Search plants"
-        className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      />
+      <div className="flex flex-wrap gap-2">
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search plants…"
+          aria-label="Search plants"
+          className="flex-1 basis-48 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        />
+        <select
+          value={geoFilter}
+          onChange={(e) => setGeoFilter(e.target.value as "" | "UK" | "Global")}
+          aria-label="Filter by geographic scope"
+          className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <option value="">UK &amp; Global</option>
+          <option value="UK">UK</option>
+          <option value="Global">Global</option>
+        </select>
+        {typeOptions.length > 0 && (
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            aria-label="Filter by plant type"
+            className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <option value="">All types</option>
+            {typeOptions.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+        )}
+        {positionOptions.length > 0 && (
+          <select
+            value={positionFilter}
+            onChange={(e) => setPositionFilter(e.target.value)}
+            aria-label="Filter by position"
+            className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <option value="">All positions</option>
+            {positionOptions.map((p) => (
+              <option key={p} value={p}>
+                {p}
+              </option>
+            ))}
+          </select>
+        )}
+      </div>
 
       {groups.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No plants match your search.</p>
+        <p className="text-sm text-muted-foreground">No plants match your search/filters.</p>
       ) : (
         <div className="flex flex-col gap-1">
           {groups.map(([letter, letterPlants]) => (

@@ -11,6 +11,12 @@ export type PlantRecord = {
   family: string | null;
   genus: string | null;
   habit: string | null;
+  // why separate from habit: habit is a growth-*form* descriptor ("Bushy",
+  // "Columnar upright") — plantTypes is RHS's own broader classification
+  // ("Trees", "Herbaceous Perennial", "Climber", ...), shown on every plant
+  // page as `.plant-profile__types .plant-profile__type` badges. A plant can
+  // have more than one (e.g. "Climber" + "Wall Shrub").
+  plantTypes: string[];
   foliage: string | null;
   nativeGb: boolean | null;
   soilTypes: string[];
@@ -107,6 +113,13 @@ function extractCardFields($: cheerio.CheerioAPI): Record<string, string> {
   return fields;
 }
 
+function extractPlantTypes($: cheerio.CheerioAPI): string[] {
+  return $(".plant-profile__types .plant-profile__type")
+    .map((_, el) => collapseWhitespace($(el).text()))
+    .toArray()
+    .filter(Boolean);
+}
+
 function splitList(value: string | undefined): string[] {
   if (!value) return [];
   return value
@@ -147,6 +160,7 @@ export function parsePlantPage(html: string, sourceUrl: string): PlantRecord | n
     family: dlFields["Family"] ?? taxon.parentTaxon?.parentTaxon?.name ?? null,
     genus: taxon.parentTaxon?.name ?? null,
     habit: dlFields["Habit"] ?? null,
+    plantTypes: extractPlantTypes($),
     foliage: dlFields["Foliage"] ?? null,
     nativeGb,
     soilTypes: splitList(cardFields["Soil Types"]),

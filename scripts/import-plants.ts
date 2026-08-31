@@ -27,6 +27,7 @@ function toRow(plant: PlantRecord) {
     family: plant.family,
     genus: plant.genus,
     habit: plant.habit,
+    plant_types: plant.plantTypes,
     foliage: plant.foliage,
     native_gb: plant.nativeGb,
     soil_types: plant.soilTypes,
