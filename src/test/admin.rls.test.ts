@@ -1,5 +1,5 @@
 import { afterAll, describe, expect, it } from "vitest";
-import { deleteUserCore, getAdminDirectoryCore, setUserAdminCore } from "@/app/actions/admin";
+import { deleteUserCore, getAdminDirectoryCore, inviteUserCore, setUserAdminCore } from "@/app/actions/admin";
 import {
   cleanupAllTestUsers,
   createServiceRoleClient,
@@ -10,11 +10,21 @@ import {
 } from "./rls-test-helpers";
 
 const createdUsers: TestUser[] = [];
+// why tracked separately, not cascaded from a test user: allowed_emails
+// rows aren't owned by any user (no FK to cascade through) — same gap
+// CLAUDE.md's Learnings documents for other shared/global tables.
+const createdAllowedEmails: string[] = [];
 
 async function newTestUser(label: string): Promise<TestUser> {
   const user = await createTestUser(label);
   createdUsers.push(user);
   return user;
+}
+
+function testEmail(label: string): string {
+  const email = `${label}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@spec-invite-test.invalid`;
+  createdAllowedEmails.push(email);
+  return email;
 }
 
 async function promoteToAdmin(userId: string): Promise<void> {
@@ -24,6 +34,11 @@ async function promoteToAdmin(userId: string): Promise<void> {
 }
 
 afterAll(async () => {
+  const admin = createServiceRoleClient();
+  if (createdAllowedEmails.length > 0) {
+    const { error } = await admin.from("allowed_emails").delete().in("email", createdAllowedEmails);
+    if (error) console.error("Failed to clean up test allowed_emails:", error);
+  }
   for (const user of createdUsers) {
     await deleteTestUser(user.userId).catch(() => {});
   }
@@ -123,5 +138,67 @@ describe("deleteUserCore", () => {
     await expect(deleteUserCore(admin.client, admin.userId, primaryAdminId)).rejects.toThrow(
       "The primary admin cannot be deleted",
     );
+  });
+});
+
+describe("inviteUserCore", () => {
+  it("rejects a non-admin acting user", async () => {
+    const nonAdmin = await newTestUser("invite-nonadmin");
+    await expect(inviteUserCore(nonAdmin.client, nonAdmin.userId, testEmail("invite-rejected"))).rejects.toThrow(
+      "Admin access required",
+    );
+  });
+
+  it("rejects an invalid email address", async () => {
+    const admin = await newTestUser("invite-bademail");
+    await promoteToAdmin(admin.userId);
+
+    await expect(inviteUserCore(admin.client, admin.userId, "not-an-email")).rejects.toThrow(
+      "Enter a valid email address",
+    );
+  });
+
+  it("adds a brand-new email to the allow-list, idempotently", async () => {
+    const admin = await newTestUser("invite-new");
+    await promoteToAdmin(admin.userId);
+    const email = testEmail("invite-new-target");
+
+    const first = await inviteUserCore(admin.client, admin.userId, email);
+    expect(first).toEqual({ alreadyInvited: false, unlockedExistingAccount: false });
+
+    const { data } = await createServiceRoleClient().from("allowed_emails").select("email").eq("email", email).maybeSingle();
+    expect(data?.email).toBe(email);
+
+    const second = await inviteUserCore(admin.client, admin.userId, email);
+    expect(second).toEqual({ alreadyInvited: true, unlockedExistingAccount: false });
+  });
+
+  it("normalizes email case/whitespace before checking the allow-list", async () => {
+    const admin = await newTestUser("invite-normalize");
+    await promoteToAdmin(admin.userId);
+    const email = testEmail("invite-normalize-target");
+
+    await inviteUserCore(admin.client, admin.userId, email);
+    const second = await inviteUserCore(admin.client, admin.userId, `  ${email.toUpperCase()}  `);
+    expect(second.alreadyInvited).toBe(true);
+  });
+
+  it("unlocks an existing account whose profile was never allowed, without needing a second invite", async () => {
+    const admin = await newTestUser("invite-unlock-admin");
+    await promoteToAdmin(admin.userId);
+    // why not testEmail() here: this target needs a real auth.users row
+    // (via createTestUser), whose email createTestUser generates itself —
+    // still tracked below via deleteTestUser in createdUsers, not
+    // createdAllowedEmails, since it's a real user row, not a bare
+    // allow-list entry.
+    const target = await newTestUser("invite-unlock-target");
+    await createServiceRoleClient().from("profiles").update({ is_allowed: false }).eq("id", target.userId);
+
+    const result = await inviteUserCore(admin.client, admin.userId, target.email);
+    expect(result).toEqual({ alreadyInvited: false, unlockedExistingAccount: true });
+    createdAllowedEmails.push(target.email.toLowerCase());
+
+    const { data } = await createServiceRoleClient().from("profiles").select("is_allowed").eq("id", target.userId).single();
+    expect(data?.is_allowed).toBe(true);
   });
 });

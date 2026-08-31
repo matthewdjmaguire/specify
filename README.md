@@ -34,7 +34,11 @@ vercel env pull .env.local
 
 Key variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (client-safe),
 `SUPABASE_SERVICE_ROLE_KEY` (server-side only, never exposed to the browser),
-`POSTGRES_URL_NON_POOLING` (direct connection, used for applying migrations).
+`POSTGRES_URL_NON_POOLING` (direct connection, used for applying migrations),
+`RESEND_API_KEY` (transactional email — invite/account-removed notices, provisioned via the
+Vercel Marketplace `resend/resend-email` integration; admin actions still work without it, they
+just skip the notification email and log a server-side error), `EMAIL_FROM` (optional, defaults
+to `Specify <notifications@magenterprises.org>`).
 
 ## Database migrations
 

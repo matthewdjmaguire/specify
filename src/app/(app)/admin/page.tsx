@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeRow } from "../settings/quizzes/theme-row";
 import { UserRow } from "./user-row";
 import { PlantImportSection } from "./plant-import-section";
+import { InviteUserSection } from "./invite-user-section";
 
 export default async function AdminPage() {
   const supabase = await createClient();
@@ -35,6 +36,8 @@ export default async function AdminPage() {
   return (
     <div className="flex flex-1 flex-col items-center gap-8 p-8">
       <h1 className="text-2xl font-semibold tracking-tight">Admin</h1>
+
+      <InviteUserSection />
 
       <section className="flex w-full max-w-2xl flex-col gap-3">
         <h2 className="text-lg font-medium">Users</h2>
