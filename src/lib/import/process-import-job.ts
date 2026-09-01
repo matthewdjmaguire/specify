@@ -81,6 +81,17 @@ export async function processImportJobTick(supabase: SupabaseClient, job: JobRow
   let index = job.next_candidate_index;
   const endIndex = Math.min(index + URLS_PER_TICK, candidateUrls.length);
 
+  // why fetched once per tick, scoped to this genus: a second/third top-up
+  // job for a genus that already has plants would otherwise re-encounter
+  // the same early candidates every time (each job walks candidateUrls from
+  // index 0 again) and, since upsert-on-conflict "succeeds" whether it's a
+  // real insert or a no-op update, trivially satisfy a small target_count
+  // by re-touching plants it already has — never making real progress into
+  // fresh candidates. Found via a category top-up round that queued 63
+  // jobs but grew the catalogue by only 1 plant.
+  const { data: existingRows } = await supabase.from("plants").select("scientific_name").eq("genus", job.genus);
+  const existingNames = new Set((existingRows ?? []).map((r) => r.scientific_name as string));
+
   for (; index < endIndex && importedCount < job.target_count; index++) {
     const url = candidateUrls[index];
     if (index > job.next_candidate_index) await sleep(REQUEST_DELAY_MS);
@@ -99,9 +110,17 @@ export async function processImportJobTick(supabase: SupabaseClient, job: JobRow
       // this bare isn't worth surfacing as a real catalogue entry, so it's
       // skipped (not counted toward the job's target) rather than imported.
       if (!plant || !plant.imageUrl) continue;
+      // why skipped, not just left to upsert harmlessly: counting an
+      // already-known plant toward the target is what caused the stall
+      // described above — this makes target_count mean "N *new* plants",
+      // matching what an admin actually means by "top up".
+      if (existingNames.has(plant.scientificName)) continue;
 
       const { error } = await supabase.from("plants").upsert(toRow(plant), { onConflict: "scientific_name" });
-      if (!error) importedCount++;
+      if (!error) {
+        importedCount++;
+        existingNames.add(plant.scientificName);
+      }
     } catch {
       // one bad page shouldn't fail the whole job — skipped, counted as
       // fetched so the job still makes forward progress through the list.
