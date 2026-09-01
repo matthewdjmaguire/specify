@@ -13,7 +13,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!profile) redirect("/sign-in");
 
   return (
-    <div className="flex min-h-full">
+    // why min-h-dvh, not min-h-full: min-h-full is a percentage, which only
+    // resolves against a definite ancestor height — body here only has
+    // min-height (auto content height otherwise), so on a short page this
+    // row (and the sidebar's stretched background inside it) fell short of
+    // the actual viewport. dvh is viewport-relative regardless of ancestor
+    // height, and tracks mobile browser chrome (address bar) correctly.
+    <div className="flex min-h-dvh">
       <Sidebar themes={themes} />
       <div className="flex flex-1 flex-col">
         <AppHeader profile={profile} />
