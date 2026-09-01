@@ -81,15 +81,24 @@ export async function processImportJobTick(supabase: SupabaseClient, job: JobRow
   let index = job.next_candidate_index;
   const endIndex = Math.min(index + URLS_PER_TICK, candidateUrls.length);
 
-  // why fetched once per tick, scoped to this genus: a second/third top-up
-  // job for a genus that already has plants would otherwise re-encounter
-  // the same early candidates every time (each job walks candidateUrls from
-  // index 0 again) and, since upsert-on-conflict "succeeds" whether it's a
-  // real insert or a no-op update, trivially satisfy a small target_count
-  // by re-touching plants it already has — never making real progress into
-  // fresh candidates. Found via a category top-up round that queued 63
-  // jobs but grew the catalogue by only 1 plant.
-  const { data: existingRows } = await supabase.from("plants").select("scientific_name").eq("genus", job.genus);
+  // why fetched once per tick, not scoped by genus column: a second/third
+  // top-up job for a genus that already has plants would otherwise
+  // re-encounter the same early candidates every time (each job walks
+  // candidateUrls from index 0 again) and, since upsert-on-conflict
+  // "succeeds" whether it's a real insert or a no-op update, trivially
+  // satisfy a small target_count by re-touching plants it already has —
+  // never making real progress into fresh candidates. Found via a category
+  // top-up round that queued 63 jobs but grew the catalogue by only 1
+  // plant. Deliberately not filtered by `.eq("genus", job.genus)` — a first
+  // attempt at this fix did exactly that and silently matched zero rows,
+  // because job.genus is the lowercase RHS slug ("clematis") while the
+  // stored `plants.genus` column is properly-cased ("Clematis"); confirmed
+  // live (`select genus from plants where genus ilike 'clematis'` returned
+  // "Clematis") after a second top-up round showed jobs reporting
+  // imported=3/3 with zero net growth in the plants table. scientific_name
+  // is the upsert's actual conflict target and is globally unique, so a
+  // full-table fetch is both correct and (at catalogue-seed scale) cheap.
+  const { data: existingRows } = await supabase.from("plants").select("scientific_name");
   const existingNames = new Set((existingRows ?? []).map((r) => r.scientific_name as string));
 
   for (; index < endIndex && importedCount < job.target_count; index++) {
