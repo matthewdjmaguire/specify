@@ -101,4 +101,29 @@ describe("selectQuizPlants", () => {
     expect(result).toHaveLength(4);
     expect(new Set(result.map((p) => p.id)).size).toBe(4);
   });
+
+  // why this test exists: "random" mode is the whole point of the setting —
+  // a heavily-missed plant (weight up to 10, see plant-mastery.ts) must not
+  // be favoured over a mastered one (weight down to 0.1) once the user has
+  // switched away from priority-based selection.
+  it("ignores priority_weight entirely in random mode", () => {
+    const plants = [plant("heavily-missed"), plant("mastered")];
+    const weights = new Map([
+      ["heavily-missed", 10],
+      ["mastered", 0.1],
+    ]);
+    const trials = 2000;
+    let masteredPickedFirst = 0;
+    for (let i = 0; i < trials; i++) {
+      const [first] = selectQuizPlants(plants, weights, 1, Math.random, "random");
+      if (first.id === "mastered") masteredPickedFirst++;
+    }
+    // why a wide band around 50%, not an exact count: this is a real
+    // statistical test using Math.random — the same 2000-trial thinking
+    // that flaked in weightedSampleWithoutReplacement's own test doesn't
+    // apply here (that test needed headroom for a ~1000:1 weight ratio;
+    // this test only needs to show "roughly even", not "true 1:1 draws").
+    expect(masteredPickedFirst).toBeGreaterThan(trials * 0.4);
+    expect(masteredPickedFirst).toBeLessThan(trials * 0.6);
+  });
 });

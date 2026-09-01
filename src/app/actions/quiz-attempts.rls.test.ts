@@ -64,6 +64,39 @@ describe("starting a quiz attempt (against the live schema)", () => {
     );
   });
 
+  // why this only checks the wiring succeeds, not the distribution: the
+  // actual "does random mode ignore priority_weight" statistical property
+  // is already covered by select-plants.test.ts's "ignores priority_weight
+  // entirely in random mode" unit test — this just proves
+  // profiles.quiz_plant_selection reaches selectQuizPlants through the real
+  // server-action/DB path (SPEC-028's global learning-vs-random setting,
+  // added after Jamie reported seeing the same plants repeatedly under the
+  // default priority-weighted selection).
+  it("respects the profile's quiz_plant_selection = 'random' setting without erroring", async () => {
+    const user = await newTestUser("startquiz-random-mode");
+    await user.client.from("profiles").update({ quiz_plant_selection: "random" }).eq("id", user.userId);
+
+    const { data: theme } = await user.client
+      .from("quiz_themes")
+      .insert({ display_name: "Acer random", prompt: "acer", owner_id: user.userId, is_global: false })
+      .select("id")
+      .single();
+
+    const attemptId = await startQuizAttemptAs(user, {
+      themeId: theme!.id,
+      mode: "learning",
+      geoScope: "Global",
+      questionCount: 3,
+    });
+
+    const { data: attempt } = await user.client
+      .from("quiz_attempts")
+      .select("question_count")
+      .eq("id", attemptId)
+      .single();
+    expect(attempt!.question_count).toBeGreaterThan(0);
+  });
+
   it("caps question_count at however many plants actually match a narrow scope", async () => {
     const user = await newTestUser("startquiz-narrow");
     const { data: theme } = await user.client

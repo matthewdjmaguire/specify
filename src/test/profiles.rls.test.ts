@@ -32,7 +32,7 @@ describe("profiles RLS", () => {
     const user = await newTestUser("signup");
     const { data, error } = await user.client
       .from("profiles")
-      .select("id, is_allowed, is_admin, is_primary_admin, geo_scope, quiz_length, followup_count")
+      .select("id, is_allowed, is_admin, is_primary_admin, geo_scope, quiz_length, followup_count, quiz_plant_selection")
       .eq("id", user.userId)
       .single();
 
@@ -44,6 +44,7 @@ describe("profiles RLS", () => {
       geo_scope: "UK",
       quiz_length: 20,
       followup_count: 1,
+      quiz_plant_selection: "priority",
     });
   });
 

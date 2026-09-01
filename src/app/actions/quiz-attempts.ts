@@ -3,7 +3,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { resolveThemePlants } from "@/lib/quiz/resolve-theme-plants";
-import { selectQuizPlants } from "@/lib/quiz/select-plants";
+import { selectQuizPlants, type PlantSelectionMode } from "@/lib/quiz/select-plants";
 import { selectFollowupCategories } from "@/lib/quiz/followup-questions";
 import { getFavouritePlantIdsCore } from "./favourites";
 import type { QuizPlant } from "@/lib/quiz/types";
@@ -69,7 +69,14 @@ export async function startQuizAttemptCore(
     );
   const weights = new Map((statsRows ?? []).map((row) => [row.plant_id, row.priority_weight]));
 
-  const selected = selectQuizPlants(plants, weights, input.questionCount);
+  const { data: selectionProfile } = await supabase
+    .from("profiles")
+    .select("quiz_plant_selection")
+    .eq("id", userId)
+    .single();
+  const selectionMode = (selectionProfile?.quiz_plant_selection as PlantSelectionMode | undefined) ?? "priority";
+
+  const selected = selectQuizPlants(plants, weights, input.questionCount, Math.random, selectionMode);
 
   const { data: attempt, error: attemptError } = await supabase
     .from("quiz_attempts")

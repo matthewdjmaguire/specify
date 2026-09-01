@@ -7,6 +7,7 @@ export type ProfileSettingsInput = {
   geoScope: "UK" | "Global";
   quizLength: 20 | 50 | 100;
   followupCount: number;
+  quizPlantSelection: "priority" | "random";
 };
 
 // why this doesn't re-check is_admin/is_allowed itself: those columns
@@ -26,6 +27,7 @@ export async function updateProfileSettings(input: ProfileSettingsInput): Promis
       geo_scope: input.geoScope,
       quiz_length: input.quizLength,
       followup_count: input.followupCount,
+      quiz_plant_selection: input.quizPlantSelection,
     })
     .eq("id", user.id);
   if (error) throw error;

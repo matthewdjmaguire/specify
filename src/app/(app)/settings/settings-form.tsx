@@ -11,6 +11,11 @@ const GEO_OPTIONS: Array<{ value: ProfileSettingsInput["geoScope"]; label: strin
 
 const QUIZ_LENGTH_OPTIONS: ProfileSettingsInput["quizLength"][] = [20, 50, 100];
 
+const PLANT_SELECTION_OPTIONS: Array<{ value: ProfileSettingsInput["quizPlantSelection"]; label: string }> = [
+  { value: "priority", label: "Learning" },
+  { value: "random", label: "Random" },
+];
+
 function SelectableGroup<T extends string | number>({
   value,
   options,
@@ -45,13 +50,14 @@ export function SettingsForm({ initial }: { initial: ProfileSettingsInput }) {
   const [geoScope, setGeoScope] = useState(initial.geoScope);
   const [quizLength, setQuizLength] = useState(initial.quizLength);
   const [followupCount, setFollowupCount] = useState(initial.followupCount);
+  const [quizPlantSelection, setQuizPlantSelection] = useState(initial.quizPlantSelection);
   const [isPending, startTransition] = useTransition();
   const [saved, setSaved] = useState(false);
 
   function handleSave() {
     setSaved(false);
     startTransition(async () => {
-      await updateProfileSettings({ geoScope, quizLength, followupCount });
+      await updateProfileSettings({ geoScope, quizLength, followupCount, quizPlantSelection });
       setSaved(true);
     });
   }
@@ -77,6 +83,20 @@ export function SettingsForm({ initial }: { initial: ProfileSettingsInput }) {
           value={followupCount}
           options={[1, 2, 3, 4, 5]}
           onChange={setFollowupCount}
+        />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium">Plant selection</label>
+        <p className="text-xs text-muted-foreground">
+          Learning prioritises plants you&apos;ve missed, so quizzes lean towards them until you&apos;ve got them
+          right a few times — Random picks evenly from the whole quiz instead.
+        </p>
+        <SelectableGroup
+          value={quizPlantSelection}
+          options={PLANT_SELECTION_OPTIONS.map((o) => o.value)}
+          labels={Object.fromEntries(PLANT_SELECTION_OPTIONS.map((o) => [o.value, o.label]))}
+          onChange={setQuizPlantSelection}
         />
       </div>
 

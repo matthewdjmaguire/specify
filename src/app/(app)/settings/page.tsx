@@ -15,7 +15,7 @@ export default async function SettingsPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("display_name, avatar_url, geo_scope, quiz_length, followup_count")
+    .select("display_name, avatar_url, geo_scope, quiz_length, followup_count, quiz_plant_selection")
     .eq("id", user.id)
     .single();
   if (!profile) redirect("/sign-in");
@@ -33,6 +33,7 @@ export default async function SettingsPage() {
           geoScope: profile.geo_scope as "UK" | "Global",
           quizLength: profile.quiz_length as 20 | 50 | 100,
           followupCount: profile.followup_count,
+          quizPlantSelection: profile.quiz_plant_selection as "priority" | "random",
         }}
       />
 

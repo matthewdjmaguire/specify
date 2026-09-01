@@ -22,20 +22,29 @@ export function weightedSampleWithoutReplacement<T>(
   return keyed.slice(0, Math.min(count, keyed.length)).map((k) => k.item);
 }
 
+export type PlantSelectionMode = "priority" | "random";
+
 // why plant_stats.priority_weight (not computed here): SPEC-017 owns
 // *writing* the weight (raise after a miss, decay after repeated correct
 // answers, with its own floor) — this module only ever reads it and turns it
 // into a selection. A plant with no plant_stats row yet (never quizzed)
 // defaults to weight 1, same as a freshly-reset plant.
+//
+// why a mode flag rather than a second function: "random" mode is just
+// "priority" mode with every weight forced to 1 — reusing
+// weightedSampleWithoutReplacement for both keeps the randomised-order
+// guarantee (see its own doc comment) instead of duplicating a plain
+// Fisher-Yates shuffle here.
 export function selectQuizPlants(
   plants: QuizPlant[],
   weightsByPlantId: Map<string, number>,
   questionCount: number,
   random: () => number = Math.random,
+  mode: PlantSelectionMode = "priority",
 ): QuizPlant[] {
   const weighted = plants.map((plant) => ({
     item: plant,
-    weight: weightsByPlantId.get(plant.id) ?? 1,
+    weight: mode === "random" ? 1 : (weightsByPlantId.get(plant.id) ?? 1),
   }));
   return weightedSampleWithoutReplacement(weighted, questionCount, random);
 }
