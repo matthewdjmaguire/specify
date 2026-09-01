@@ -24,13 +24,29 @@ export function QuizProgressRail({
   items,
   currentIndex,
   onJump,
+  percentMode = "answered",
 }: {
   items: RailItem[];
   currentIndex: number;
   onJump: (index: number) => void;
+  // why a mode flag, not always deriving from item status: "answered"
+  // means "% complete" tracks score progress, which only means something in
+  // scored modes (Intermediate/Hard) — every question in Learning mode
+  // stays "unanswered" forever by design (nothing is ever scored there, see
+  // quiz-runner's revealLevel/handleFinish comments), which pinned this at
+  // a permanent 0% instead of moving as the user pages through the deck.
+  // "position" tracks how far through the deck currentIndex has reached
+  // instead, which is the only definition of "complete" that makes sense
+  // for an unscored flashcard mode.
+  percentMode?: "answered" | "position";
 }) {
   const answered = items.filter((i) => i.status !== "unanswered").length;
-  const percent = items.length > 0 ? Math.round((answered / items.length) * 100) : 0;
+  const percent =
+    items.length === 0
+      ? 0
+      : percentMode === "position"
+        ? Math.round(((currentIndex + 1) / items.length) * 100)
+        : Math.round((answered / items.length) * 100);
 
   return (
     <div className="w-full max-w-2xl">

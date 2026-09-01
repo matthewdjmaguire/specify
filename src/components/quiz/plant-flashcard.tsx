@@ -18,6 +18,7 @@ export function PlantFlashcard({
   plant,
   revealLevel,
   isFavourite,
+  defaultDetailsOpen = false,
 }: {
   plant: QuizPlant;
   revealLevel: RevealLevel;
@@ -26,16 +27,24 @@ export function PlantFlashcard({
   // clickable to expand/collapse there) rather than the quiz flow's fixed
   // corner button.
   isFavourite?: boolean;
+  // why Learning mode overrides this to true: Learning mode has no
+  // follow-up question to eventually reveal details for (see quiz-runner's
+  // revealLevel comment) and nothing else on screen to push off-screen —
+  // it's a flashcard deck meant to teach, so showing full details
+  // immediately is more useful than a collapsed card. Intermediate/Hard
+  // keep the collapsed default described below, since those modes render
+  // real answer options beneath the card.
+  defaultDetailsOpen?: boolean;
 }) {
   // why collapsed by default rather than always showing full details: per
   // direct feedback, the full field grid + description pushed the Next
   // button off an iPhone-height screen once a follow-up question's own
   // options were added below it. The caller resets this by keying the
   // component on plant.id — switching plants should default back to
-  // collapsed, but moving between two questions *for the same plant* (the
-  // ID question and its follow-up) shouldn't re-collapse an already-opened
-  // card.
-  const [detailsOpen, setDetailsOpen] = useState(false);
+  // whatever defaultDetailsOpen says, but moving between two questions *for
+  // the same plant* (the ID question and its follow-up) shouldn't re-close
+  // an already-opened card.
+  const [detailsOpen, setDetailsOpen] = useState(defaultDetailsOpen);
 
   return (
     <Card className="w-full max-w-md overflow-hidden gap-0 py-0">

@@ -186,6 +186,7 @@ export function QuizRunner({
         items={questions.map((q) => ({ status: q.status }))}
         currentIndex={index}
         onJump={goToIndex}
+        percentMode={mode === "learning" ? "position" : "answered"}
       />
 
       <div className="relative w-full max-w-md">
@@ -194,6 +195,7 @@ export function QuizRunner({
           plant={current.plant}
           revealLevel={revealLevel}
           isFavourite={favouriteIds.has(current.plant.id)}
+          defaultDetailsOpen={mode === "learning"}
         />
         {justAnswered?.questionId === current.questionId && <AnswerFeedbackFlash isCorrect={justAnswered.correct} />}
       </div>
